@@ -16,6 +16,13 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LogOut, Save, TestTube, Eye, EyeOff } from "lucide-react";
 import {
   Card,
@@ -28,23 +35,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
-const settingsConfig = [
+interface Setting {
+    key: string;
+    description: string;
+    type: 'secret' | 'model';
+    isManaged?: boolean;
+    value?: string;
+    options?: { value: string; label: string; recommended?: boolean }[];
+}
+
+const settingsConfig: { group: string, settings: Setting[] }[] = [
   {
     group: "Gemini",
     settings: [
       {
         key: "gemini_api_key",
         description: "API key for Gemini services, managed via .env file.",
-        isSecret: true,
+        type: 'secret',
         isManaged: true,
       },
       {
         key: "gemini_model",
-        value: "gemini-2.5-flash",
         description: "Default model for analysis.",
-        isSecret: false,
-        isManaged: false,
+        type: 'model',
+        value: "gemini-2.5-flash",
+        options: [
+            { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash", recommended: true },
+            { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+            { value: "gemini-2.0-pro", label: "Gemini 2.0 Pro" },
+        ]
       },
     ],
   },
@@ -54,15 +75,19 @@ const settingsConfig = [
       {
         key: "groq_api_key",
         description: "API key for Groq services, managed via .env file.",
-        isSecret: true,
+        type: 'secret',
         isManaged: true,
       },
       {
         key: "groq_model",
-        value: "llama3-70b-8192",
         description: "Default model for analysis.",
-        isSecret: false,
-        isManaged: false,
+        type: 'model',
+        value: "llama3-70b-8192",
+        options: [
+            { value: "llama3-70b-8192", label: "Llama3 70b", recommended: true },
+            { value: "llama3-8b-8192", label: "Llama3 8b" },
+            { value: "mixtral-8x7b-32768", label: "Mixtral 8x7b" },
+        ]
       },
     ],
   },
@@ -108,41 +133,29 @@ function SettingsGroup({
   settings,
 }: {
   group: string;
-  settings: { key: string; value?: string; description: string, isSecret: boolean, isManaged: boolean }[];
+  settings: Setting[];
 }) {
   return (
     <div>
       <h3 className="text-lg font-semibold font-headline mb-4">{group}</h3>
       <div className="space-y-4">
-        {settings.map((setting) => {
-          const { key, ...rest } = setting;
-          return <SettingInput key={key} id={key} {...rest} />
-        })}
+        {settings.map((setting) => (
+          <SettingInput key={setting.key} setting={setting} />
+        ))}
       </div>
     </div>
   );
 }
 
-function SettingInput({
-  id,
-  value,
-  description,
-  isSecret,
-  isManaged,
-}: {
-  id: string;
-  value?: string;
-  description: string;
-  isSecret: boolean;
-  isManaged: boolean;
-}) {
+function SettingInput({ setting }: { setting: Setting }) {
+  const { key, description, type, isManaged, value, options } = setting;
   const [showSecret, setShowSecret] = useState(false);
   const { toast } = useToast();
 
   const handleTest = () => {
     toast({
       title: "Testing Key...",
-      description: `Pinging ${id} endpoint.`,
+      description: `Pinging ${key} endpoint.`,
     });
     // Mock API call to /api/settings/test
     setTimeout(() => {
@@ -150,52 +163,74 @@ function SettingInput({
       if (success) {
         toast({
           title: "Connection Successful",
-          description: `The key for ${id} is valid.`,
+          description: `The key for ${key} is valid.`,
         });
       } else {
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: `The key for ${id} is invalid or the service is down.`,
+          description: `The key for ${key} is invalid or the service is down.`,
         });
       }
     }, 1500);
   };
 
+  const renderInput = () => {
+    switch (type) {
+        case 'secret':
+            return (
+                <div className="relative w-full">
+                  <Input
+                    id={key}
+                    defaultValue={"••••••••••••••••"}
+                    type={showSecret ? "text" : "password"}
+                    readOnly
+                    disabled={isManaged}
+                  />
+                  <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                      onClick={() => setShowSecret(!showSecret)}
+                      disabled={isManaged}
+                    >
+                      {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+            );
+        case 'model':
+            return (
+                <Select defaultValue={value} disabled={isManaged}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a model..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {options?.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                                <div className="flex items-center gap-2">
+                                    <span>{option.label}</span>
+                                    {option.recommended && <Badge variant="secondary">Recommended</Badge>}
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )
+    }
+  }
+
+
   return (
     <div className="grid md:grid-cols-3 items-center gap-4">
       <div className="md:col-span-1">
-        <Label htmlFor={id} className="font-medium">
-          {id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+        <Label htmlFor={key} className="font-medium">
+          {key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
         </Label>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
       <div className="md:col-span-2 flex items-center gap-2">
-        <div className="relative w-full">
-          <Input
-            id={id}
-            defaultValue={isSecret ? "••••••••••••••••" : value}
-            type={isSecret && !showSecret ? "password" : "text"}
-            readOnly
-            disabled={isManaged || isSecret}
-          />
-          {isSecret && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
-              onClick={() => setShowSecret(!showSecret)}
-              disabled={isManaged}
-            >
-              {showSecret ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-        </div>
-        {isSecret && (
+        {renderInput()}
+        {type === 'secret' && (
           <Button variant="outline" size="icon" onClick={handleTest} disabled={isManaged}>
             <TestTube className="h-4 w-4" />
           </Button>
