@@ -35,14 +35,16 @@ const settingsConfig = [
     settings: [
       {
         key: "gemini_api_key",
-        description: "API key for Gemini services.",
+        description: "API key for Gemini services, managed via .env file.",
         isSecret: true,
+        isManaged: true,
       },
       {
         key: "gemini_model",
         value: "gemini-2.5-flash",
         description: "Default model for analysis.",
         isSecret: false,
+        isManaged: false,
       },
     ],
   },
@@ -51,14 +53,16 @@ const settingsConfig = [
     settings: [
       {
         key: "groq_api_key",
-        description: "API key for Groq services.",
+        description: "API key for Groq services, managed via .env file.",
         isSecret: true,
+        isManaged: true,
       },
       {
         key: "groq_model",
         value: "llama3-70b-8192",
         description: "Default model for analysis.",
         isSecret: false,
+        isManaged: false,
       },
     ],
   },
@@ -104,7 +108,7 @@ function SettingsGroup({
   settings,
 }: {
   group: string;
-  settings: { key: string; value?: string; description: string, isSecret: boolean }[];
+  settings: { key: string; value?: string; description: string, isSecret: boolean, isManaged: boolean }[];
 }) {
   return (
     <div>
@@ -124,11 +128,13 @@ function SettingInput({
   value,
   description,
   isSecret,
+  isManaged,
 }: {
   id: string;
   value?: string;
   description: string;
   isSecret: boolean;
+  isManaged: boolean;
 }) {
   const [showSecret, setShowSecret] = useState(false);
   const { toast } = useToast();
@@ -170,7 +176,8 @@ function SettingInput({
             id={id}
             defaultValue={isSecret ? "••••••••••••••••" : value}
             type={isSecret && !showSecret ? "password" : "text"}
-            readOnly={isSecret}
+            readOnly
+            disabled={isManaged || isSecret}
           />
           {isSecret && (
             <Button
@@ -178,6 +185,7 @@ function SettingInput({
               size="icon"
               className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
               onClick={() => setShowSecret(!showSecret)}
+              disabled={isManaged}
             >
               {showSecret ? (
                 <EyeOff className="h-4 w-4" />
@@ -188,11 +196,11 @@ function SettingInput({
           )}
         </div>
         {isSecret && (
-          <Button variant="outline" size="icon" onClick={handleTest}>
+          <Button variant="outline" size="icon" onClick={handleTest} disabled={isManaged}>
             <TestTube className="h-4 w-4" />
           </Button>
         )}
-        <Button size="icon">
+        <Button size="icon" disabled={isManaged}>
           <Save className="h-4 w-4" />
         </Button>
       </div>
