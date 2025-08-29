@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -37,6 +38,7 @@ import { AnalysisDisplay } from "./analysis-display";
 import type { AnalysisReport } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { templates } from "@/lib/templates";
+import { AiTeamAnimation } from "./ai-team-animation";
 
 const formSchema = z.object({
   logs: z.string().min(50, "Please provide at least 50 characters of log data."),
@@ -105,7 +107,7 @@ export function LogAnalyzer() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="space-y-6">
       <Card className="neo-outset">
         <CardHeader>
           <CardTitle className="font-headline">Analyze Error Logs</CardTitle>
@@ -145,7 +147,7 @@ export function LogAnalyzer() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Provide the raw log data from your application. For best results, include the full error message and any surrounding log entries that provide context.
+                      Provide the raw log data from your application. For best results, include the full error message and any surrounding log entries that provide context. This information is sent to a secure AI model for analysis.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -173,7 +175,7 @@ export function LogAnalyzer() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Select a template to guide the AI in generating a response tailored to a specific DevOps task, such as creating a postmortem report or a developer bug ticket.
+                      Choose a template to guide the AI in generating a response tailored to a specific DevOps task. This helps structure the output for creating a postmortem report, a developer bug ticket, or other common actions.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -188,7 +190,7 @@ export function LogAnalyzer() {
                     <div className="space-y-1.5">
                       <FormLabel>Integrate Traceback Analysis</FormLabel>
                       <FormDescription>
-                        Enable this to have the AI specifically parse stack traces from the logs. This provides a more detailed breakdown of the error's origin and relevant code frames.
+                        Enable this to have the AI specifically parse stack traces from the logs. This provides a more detailed breakdown of the error's origin and relevant code frames, leading to a more precise analysis.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -223,10 +225,7 @@ export function LogAnalyzer() {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-              <Loader2 className="w-12 h-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">
-                AI is thinking... this may take a moment.
-              </p>
+              <AiTeamAnimation />
             </CardContent>
           </Card>
         )}
