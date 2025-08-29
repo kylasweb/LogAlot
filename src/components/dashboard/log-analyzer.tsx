@@ -112,14 +112,14 @@ export function LogAnalyzer() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="logs"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-between items-center">
-                      <FormLabel>Paste Logs Here</FormLabel>
+                      <FormLabel>Paste Logs or Upload File</FormLabel>
                       <Button 
                         type="button" 
                         variant="outline" 
@@ -144,6 +144,9 @@ export function LogAnalyzer() {
                         {...field}
                       />
                     </FormControl>
+                    <FormDescription>
+                      Provide the raw log data from your application. For best results, include the full error message and any surrounding log entries that provide context.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -170,7 +173,7 @@ export function LogAnalyzer() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Choose a template to structure the AI analysis.
+                      Select a template to guide the AI in generating a response tailored to a specific DevOps task, such as creating a postmortem report or a developer bug ticket.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -181,11 +184,11 @@ export function LogAnalyzer() {
                 control={form.control}
                 name="includeTraceback"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 neo-outset">
-                    <div className="space-y-0.5">
-                      <FormLabel>Integrate Traceback</FormLabel>
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 neo-outset">
+                    <div className="space-y-1.5">
+                      <FormLabel>Integrate Traceback Analysis</FormLabel>
                       <FormDescription>
-                        Parse and include traceback frames in the analysis.
+                        Enable this to have the AI specifically parse stack traces from the logs. This provides a more detailed breakdown of the error's origin and relevant code frames.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -198,7 +201,7 @@ export function LogAnalyzer() {
                 )}
               />
 
-              <Button type="submit" className="w-full neo-button" disabled={isLoading}>
+              <Button type="submit" className="w-full !mt-10 neo-button" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="animate-spin" />
                 ) : (

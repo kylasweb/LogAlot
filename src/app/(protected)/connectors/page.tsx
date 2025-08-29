@@ -76,7 +76,7 @@ export default function ConnectorsPage() {
         <UserMenu />
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <div className="mx-auto max-w-4xl space-y-6">
+        <div className="mx-auto max-w-6xl space-y-6">
           {connectors.map((connector) => (
             <Card key={connector.name} className="neo-outset">
               <CardHeader className="flex flex-row items-center gap-4">

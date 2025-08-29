@@ -105,7 +105,7 @@ export default function SettingsPage() {
         <UserMenu />
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">
@@ -138,9 +138,10 @@ function SettingsGroup({
     <div>
       <h3 className="text-lg font-semibold font-headline mb-4">{group}</h3>
       <div className="space-y-4">
-        {settings.map(({ key, ...settingProps }) => (
-          <SettingInput key={key} settingKey={key} {...settingProps} />
-        ))}
+        {settings.map((setting) => {
+          const { key, ...settingProps } = setting;
+          return <SettingInput key={key} settingKey={key} {...settingProps} />
+        })}
       </div>
     </div>
   );
@@ -186,7 +187,7 @@ function SettingInput({
     <div className="grid md:grid-cols-3 items-center gap-4">
       <div className="md:col-span-1">
         <Label htmlFor={settingKey} className="font-medium">
-          {settingKey}
+          {settingKey.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
         </Label>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
