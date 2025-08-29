@@ -11,19 +11,24 @@ export default function HowToUsePage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="prose prose-stone dark:prose-invert max-w-none">
-        <h3>The Log Analyzer</h3>
+        <h3>The Log Analyzer Dashboard</h3>
         <p>
-          The main log analyzer interface is where you can paste or upload log files. The AI will then process the logs based on the selected template.
+          The main dashboard is where you paste or upload log files. The AI will then process the logs based on the active workflow selected in the Agentic Workflow Manager. You can also apply a formatting template to the final report.
+        </p>
+        
+        <h3>Agentic Workflow Manager</h3>
+        <p>
+          This is the central hub for controlling your AI analysis pipelines. You can create and edit individual agents, defining their models and system instructions. The Workflow Builder allows you to chain these agents together in any order to form a custom analysis process.
         </p>
 
-        <h3>Analysis Report</h3>
+        <h3>Fine-Tuning, A/B Testing, and Hyper-parameters</h3>
         <p>
-          The analysis report provides a comprehensive breakdown of the AI's findings, including a summary, root cause analysis, proposed solution, and more.
+          Under the "Agentic" menu, you'll find advanced options. <strong>Fine-Tuning</strong> lets you train agents on your data. <strong>A/B Testing</strong> allows you to compare two versions of an agent's prompt or model. <strong>Hyper-parameters</strong> gives you granular control over the AI's creativity and response generation.
         </p>
 
         <h3>Connectors</h3>
         <p>
-            Connectors allow you to integrate LogAlot with third-party services like Jira, Microsoft Teams, and GitHub to streamline your workflow.
+            Connectors allow you to integrate LogAlot with third-party services like Jira, Microsoft Teams, and GitHub to streamline your workflow after an analysis is complete.
         </p>
       </CardContent>
     </Card>

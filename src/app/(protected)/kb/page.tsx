@@ -17,14 +17,17 @@ export default function KnowledgeBasePage() {
           you'll find valuable information here.
         </p>
         <p>
+          The platform now includes a powerful <strong>Agentic Workflow Manager</strong>, allowing you to create, customize, and chain AI agents to build sophisticated analysis pipelines.
+        </p>
+        <p>
           Use the navigation on the left to explore the different sections:
         </p>
         <ul>
-          <li><strong>Guides:</strong> Step-by-step tutorials for common tasks.</li>
-          <li><strong>How to Use:</strong> Detailed explanations of core features.</li>
+          <li><strong>Guides:</strong> Step-by-step tutorials for common tasks like building a custom workflow.</li>
+          <li><strong>How to Use:</strong> Detailed explanations of core features like the Workflow Builder and Fine-Tuning.</li>
           <li><strong>Logics Used:</strong> A look under the hood at the AI and system logic.</li>
-          <li><strong>Template Explanations:</strong> Breakdowns of the various analysis templates.</li>
-          <li><strong>Configurations:</strong> Information on how to configure AI providers and connectors.</li>
+          <li><strong>Template Explanations:</strong> Breakdowns of how formatting templates work with your agentic workflows.</li>
+          <li><strong>Configurations:</strong> Information on how to configure AI providers and agent hyper-parameters.</li>
         </ul>
         <p>
           We are constantly updating this documentation. If you have any questions or can't find what you're looking for,
