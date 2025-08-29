@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -29,6 +30,21 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 const mockSettings = [
+  {
+    group: "Gemini",
+    settings: [
+      {
+        key: "gemini_api_key",
+        value: "gsk-...",
+        description: "API key for Gemini services.",
+      },
+      {
+        key: "gemini_model",
+        value: "gemini-2.5-flash",
+        description: "Default model for analysis.",
+      },
+    ],
+  },
   {
     group: "OpenAI",
     settings: [
@@ -114,7 +130,7 @@ function SettingsGroup({
   settings,
 }: {
   group: string;
-  settings: (typeof mockSettings)[0]["settings"];
+  settings: { key: string; value: string; description: string }[];
 }) {
   return (
     <div>
