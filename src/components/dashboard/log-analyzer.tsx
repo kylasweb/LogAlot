@@ -39,6 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { templates } from "@/lib/templates";
 import { AiTeamAnimation } from "./ai-team-animation";
 import { Switch } from "@/components/ui/switch";
+import { exampleLogs } from "@/lib/example-logs";
 
 
 const formSchema = z.object({
@@ -129,6 +130,14 @@ export function LogAnalyzer() {
     }
   };
 
+  const loadExample = (logType: keyof typeof exampleLogs) => {
+    form.setValue("logs", exampleLogs[logType]);
+    toast({
+        title: "Example Loaded",
+        description: `The ${logType.charAt(0).toUpperCase() + logType.slice(1)} log example has been loaded into the text area.`,
+    })
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setAnalysis(null);
@@ -186,22 +195,27 @@ export function LogAnalyzer() {
                   <FormItem>
                     <div className="flex justify-between items-center">
                       <FormLabel>Paste Logs or Upload File</FormLabel>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm" 
-                        className="neo-button"
-                        onClick={() => fileInputRef.current?.click()}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload File
-                      </Button>
-                      <Input 
-                        type="file" 
-                        ref={fileInputRef}
-                        className="hidden" 
-                        onChange={handleFileChange}
-                        accept=".log,.txt,text/plain"
-                      />
+                      <div className="flex items-center gap-2">
+                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('simple')}>Simple Log</Button>
+                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('complex')}>Complex Log</Button>
+                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('confusing')}>Confusing Log</Button>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            className="neo-button"
+                            onClick={() => fileInputRef.current?.click()}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Upload File
+                          </Button>
+                          <Input 
+                            type="file" 
+                            ref={fileInputRef}
+                            className="hidden" 
+                            onChange={handleFileChange}
+                            accept=".log,.txt,text/plain"
+                          />
+                      </div>
                     </div>
                     <FormControl>
                       <Textarea
