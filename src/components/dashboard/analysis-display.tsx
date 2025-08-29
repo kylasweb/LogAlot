@@ -34,7 +34,7 @@ import {
 import type { AnalysisReport } from "@/lib/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { useToast } from "@/hooks/use-toast";
@@ -47,41 +47,43 @@ const team = [
 ];
 
 
+const markdownComponents: Components = {
+    code(props) {
+        const {children, className, node, ...rest} = props
+        const match = /language-(\w+)/.exec(className || '')
+        return match ? (
+            <SyntaxHighlighter
+                style={a11yDark}
+                language={match[1]}
+                PreTag="div"
+            >
+            {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+        ) : (
+            <code {...rest} className="bg-muted px-1 py-0.5 rounded-sm font-code">
+                {children}
+            </code>
+        )
+    },
+    p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+    ul: ({ node, ...props }) => (
+      <ul className="list-disc pl-5 space-y-1 my-2" {...props} />
+    ),
+    ol: ({ node, ...props }) => (
+      <ol className="list-decimal pl-5 space-y-1 my-2" {...props} />
+    ),
+    h3: ({ node, ...props }) => (
+      <h3
+        className="font-headline text-lg font-semibold mt-4 mb-2"
+        {...props}
+      />
+    ),
+}
+
 function Markdown({ content }: { content: string }) {
   return (
     <ReactMarkdown
-      components={{
-        code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || "");
-          return !inline && match ? (
-            <SyntaxHighlighter
-              style={a11yDark}
-              language={match[1]}
-              PreTag="div"
-              {...props}
-            >
-              {String(children).replace(/\n$/, "")}
-            </SyntaxHighlighter>
-          ) : (
-            <code className="bg-muted px-1 py-0.5 rounded-sm font-code" {...props}>
-              {children}
-            </code>
-          );
-        },
-        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
-        ul: ({ node, ...props }) => (
-          <ul className="list-disc pl-5 space-y-1 my-2" {...props} />
-        ),
-        ol: ({ node, ...props }) => (
-          <ol className="list-decimal pl-5 space-y-1 my-2" {...props} />
-        ),
-        h3: ({ node, ...props }) => (
-          <h3
-            className="font-headline text-lg font-semibold mt-4 mb-2"
-            {...props}
-          />
-        ),
-      }}
+      components={markdownComponents}
       className="text-sm leading-relaxed"
     >
       {content}
