@@ -12,6 +12,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarTrigger,
+  SidebarFooter,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import { Settings, LayoutDashboard, Link2 } from "lucide-react";
 import { Logo } from "@/components/icons";
@@ -22,11 +25,11 @@ export function MainLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
-        <Sidebar>
+        <Sidebar collapsible="icon">
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 px-2">
               <Logo className="w-8 h-8 text-primary" />
-              <span className="font-headline text-lg font-semibold text-sidebar-foreground">
+              <span className="font-headline text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
                 LogAlot
               </span>
             </Link>
@@ -71,6 +74,10 @@ export function MainLayout({ children }: { children: ReactNode }) {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
+          <SidebarFooter className="hidden md:flex">
+             <SidebarTrigger />
+          </SidebarFooter>
+          <SidebarRail />
         </Sidebar>
         <SidebarInset>{children}</SidebarInset>
       </div>
