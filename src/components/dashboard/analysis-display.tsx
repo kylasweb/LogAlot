@@ -22,6 +22,10 @@ import {
   Zap,
   Briefcase,
   GitBranch,
+  ShieldCheck,
+  TrendingUp,
+  Siren,
+  Activity
 } from "lucide-react";
 import type { AnalysisReport } from "@/lib/types";
 
@@ -86,7 +90,7 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
     <Card className="w-full neo-outset">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">
-          Analysis Report
+          Comprehensive AI Analysis Report
         </CardTitle>
         <CardDescription>
           Generated on {new Date(report.timestamp).toLocaleString()}
@@ -122,29 +126,44 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
         </div>
 
         <Separator />
+        
+        <Section icon={<Lightbulb />} title="Executive Summary">
+          <Markdown content={report.summary} />
+        </Section>
 
         {report.traceback && (
-          <Section
-            icon={<AlertTriangle className="text-destructive" />}
-            title="Traceback Summary"
-          >
-            <p className="font-mono text-sm bg-destructive/10 text-destructive p-3 rounded-md neo-inset">
-              {report.traceback.exceptionType}
-            </p>
-            <ul className="font-code text-xs space-y-1 mt-2 list-disc list-inside bg-muted/50 p-3 rounded-md neo-inset">
-              {report.traceback.relevantFrames.map((frame, i) => (
-                <li key={i}>{frame}</li>
-              ))}
-            </ul>
-          </Section>
+          <>
+            <Separator />
+            <Section
+              icon={<Siren className="text-destructive" />}
+              title="Traceback Analysis"
+            >
+              <p className="font-mono text-sm bg-destructive/10 text-destructive p-3 rounded-md neo-inset">
+                {report.traceback.exceptionType}
+              </p>
+              <h4 className="font-headline text-md font-semibold mt-4 mb-2">Detailed Flow Analysis</h4>
+              <Markdown content={report.traceback.analysis} />
+              <h4 className="font-headline text-md font-semibold mt-4 mb-2">Relevant Frames</h4>
+              <ul className="font-code text-xs space-y-1 mt-2 list-disc list-inside bg-muted/50 p-3 rounded-md neo-inset">
+                {report.traceback.relevantFrames.map((frame, i) => (
+                  <li key={i}>{frame}</li>
+                ))}
+              </ul>
+            </Section>
+          </>
         )}
 
-        <Section icon={<Lightbulb />} title="AI Analysis">
-          <Markdown content={report.analysis} />
+        <Separator />
+        <Section icon={<Activity />} title="Root Cause Analysis">
+          <Markdown content={report.rootCause} />
         </Section>
 
         <Separator />
+        <Section icon={<TrendingUp />} title="Business Impact Assessment">
+          <Markdown content={report.impact} />
+        </Section>
 
+        <Separator />
         <Section icon={<FileCode />} title="Proposed Solution">
           <Markdown content={report.proposedSolution.description} />
           <div className="mt-4">
@@ -153,10 +172,15 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
         </Section>
 
         <Separator />
-
         <Section icon={<CheckCircle />} title="Verification Steps">
           <Markdown content={report.verification} />
         </Section>
+        
+        <Separator />
+        <Section icon={<ShieldCheck />} title="Prevention Recommendations">
+          <Markdown content={report.prevention} />
+        </Section>
+
       </CardContent>
       <CardFooter className="gap-2 justify-end">
           <Button variant="outline" className="neo-button" onClick={() => handleShare('Teams')}>
@@ -190,7 +214,9 @@ function Section({
         })}
         {title}
       </h3>
-      {children}
+      <div className="pl-7">
+        {children}
+      </div>
     </div>
   );
 }

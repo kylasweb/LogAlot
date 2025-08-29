@@ -19,7 +19,10 @@ const GenerateSolutionFromErrorInputSchema = z.object({
 export type GenerateSolutionFromErrorInput = z.infer<typeof GenerateSolutionFromErrorInputSchema>;
 
 const GenerateSolutionFromErrorOutputSchema = z.object({
-  solution: z.string().describe('A potential solution to the error, including a code snippet if applicable.'),
+  solutionDescription: z.string().describe('A detailed explanation of the proposed solution.'),
+  solutionCode: z.string().describe('A code snippet demonstrating the fix. Use markdown for the code block.'),
+  verificationSteps: z.string().describe('Steps to verify that the fix has resolved the issue.'),
+  prevention: z.string().describe('Recommendations for preventing similar issues in the future.'),
   confidenceScore: z.number().describe('A confidence score (0-1) indicating the likelihood that the solution will resolve the issue.'),
 });
 export type GenerateSolutionFromErrorOutput = z.infer<typeof GenerateSolutionFromErrorOutputSchema>;
@@ -34,14 +37,19 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateSolutionFromErrorOutputSchema},
   prompt: `You are an expert software engineer specializing in debugging and resolving errors.
 
-  Based on the provided error analysis, tech stack, environment, and traceback (if available), you will generate a potential solution to the error. The solution should include a code snippet if applicable.
+  Based on the provided error analysis, tech stack, environment, and traceback (if available), you will generate a potential solution to the error.
+
+  Your response must include:
+  1.  A detailed explanation of the proposed fix.
+  2.  A code snippet (in a markdown block) demonstrating the fix.
+  3.  A set of steps to verify that the fix works as expected.
+  4.  Recommendations for long-term prevention of this class of errors.
+  5.  A confidence score (0-1) indicating the likelihood that your proposed solution will resolve the issue.
 
   Error Analysis: {{{analysis}}}
   Tech Stack: {{{techStack}}}
   Environment: {{{environment}}}
   Traceback: {{{traceback}}}
-
-  Provide a confidence score (0-1) indicating the likelihood that the solution will resolve the issue.
   `,
 });
 

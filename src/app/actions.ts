@@ -47,34 +47,38 @@ export async function analyzeLogsAction(
     }
     
     // The analysis from the summary now incorporates the template
-    const analysis = summaryResult.summary;
+    const analysisForSolution = tracebackResult ? 
+      `${summaryResult.summary}\n\nTraceback Analysis:\n${tracebackResult.analysis}` : 
+      summaryResult.summary;
 
     const solutionResult = await generateSolutionFromError({
-      analysis: analysis,
+      analysis: analysisForSolution,
       techStack,
       environment,
       traceback: includeTraceback ? logs : undefined,
     });
     
-    const verification = "To verify the fix, apply the suggested code changes and run the relevant unit tests. If the issue is intermittent, monitor the logs for recurrence after deployment.";
-
     const analysisReport: AnalysisReport = {
       id: `analysis_${new Date().getTime()}`,
       timestamp: new Date().toISOString(),
       techStack: techStack,
       environment: environment,
-      analysis: analysis,
+      summary: summaryResult.summary,
+      rootCause: summaryResult.rootCause,
+      impact: summaryResult.impact,
+      prevention: solutionResult.prevention,
       proposedSolution: {
-        description: solutionResult.solution,
-        code: solutionResult.solution.substring(solutionResult.solution.indexOf('```'), solutionResult.solution.lastIndexOf('```') + 3) || ""
+        description: solutionResult.solutionDescription,
+        code: solutionResult.solutionCode
       },
-      verification: verification,
+      verification: solutionResult.verificationSteps,
       confidenceScore: (summaryResult.confidenceScore + (tracebackResult?.confidenceScore || 0) + solutionResult.confidenceScore) / (includeTraceback ? 3 : 2),
       isIntermittent: summaryResult.isIntermittent || (tracebackResult?.isIntermittent || false),
       needsFix: summaryResult.needsFix || (tracebackResult?.needsFix || false),
       traceback: includeTraceback && tracebackResult ? {
         exceptionType: tracebackResult.exceptionType,
         relevantFrames: tracebackResult.relevantFrames,
+        analysis: tracebackResult.analysis,
       } : undefined,
     };
 

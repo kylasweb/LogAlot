@@ -3,7 +3,10 @@ export interface AnalysisReport {
   timestamp: string;
   techStack: string;
   environment: string;
-  analysis: string;
+  summary: string;
+  rootCause: string;
+  impact: string;
+  prevention: string;
   proposedSolution: {
     description: string;
     code: string;
@@ -15,5 +18,6 @@ export interface AnalysisReport {
   traceback?: {
     exceptionType: string;
     relevantFrames: string[];
+    analysis: string;
   };
 }

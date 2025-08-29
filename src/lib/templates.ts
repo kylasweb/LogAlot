@@ -74,4 +74,46 @@ If a potential vulnerability is detected, the brief must include:
 If no vulnerability is found, state that clearly.
 `,
   },
+  {
+    id: 'customer-support-response',
+    name: 'Customer Support Response',
+    prompt: `
+Draft a response to a customer who reported being affected by this error.
+
+The response should be empathetic and professional. It must include:
+- **Acknowledgement**: Acknowledge the issue and apologize for the inconvenience.
+- **Explanation**: A non-technical explanation of what went wrong.
+- **Resolution**: Reassure the customer that the issue has been resolved or is being worked on.
+- **Next Steps**: Inform them if there's anything they need to do (e.g., refresh the page, clear cache).
+- **Contact Info**: Provide a way for them to get further help.
+`,
+  },
+  {
+    id: 'system-patch-notification',
+    name: 'System Patch Notification',
+    prompt: `
+Write a system-wide notification about the deployment of a patch for this issue.
+
+The notification should be targeted at internal stakeholders and include:
+- **Change Summary**: A brief description of the fix being deployed.
+- **Reason for Change**: Explain what incident or bug this patch addresses.
+- **Deployment Window**: The date and time the patch will be deployed.
+- **Expected Impact**: Note any expected downtime or service degradation during the deployment.
+- **Rollback Plan**: Briefly describe the procedure to roll back the change if issues occur.
+`,
+  },
+    {
+    id: 'data-corruption-analysis',
+    name: 'Data Corruption Analysis',
+    prompt: `
+Analyze the logs for signs of data corruption and generate a report for a database administration team.
+
+The report should include:
+- **Corruption Signature**: Describe the pattern or anomaly in the logs that suggests data corruption.
+- **Affected Data**: Identify the specific tables, records, or documents that may be affected.
+- **Blast Radius**: Estimate the scope of the potential data corruption.
+- **Recovery Steps**: Suggest a plan to verify the corruption and restore the affected data from backups.
+- **Data-Level Prevention**: Recommend schema changes, constraints, or validation rules to prevent recurrence.
+`,
+  },
 ];
