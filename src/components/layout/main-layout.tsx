@@ -55,7 +55,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
                <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith("/agentic") && !pathname.includes('fine-tuning') && !pathname.includes('ab-testing') && !pathname.includes('hyper-parameters')}
+                  isActive={pathname.startsWith("/agentic")}
                   tooltip={{ children: "Agentic" }}
                 >
                   <Link href="/agentic">
