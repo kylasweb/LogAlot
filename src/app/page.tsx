@@ -1,3 +1,4 @@
+
 import { MainLayout } from "@/components/layout/main-layout";
 import { LogAnalyzer } from "@/components/dashboard/log-analyzer";
 import { SidebarTrigger } from "@/components/ui/sidebar";

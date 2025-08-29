@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from "react";
@@ -26,13 +27,14 @@ export function MainLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
         <Sidebar collapsible="icon">
-          <SidebarHeader>
+          <SidebarHeader className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 px-2">
               <Logo className="w-8 h-8 text-primary" />
               <span className="font-headline text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
                 LogAlot
               </span>
             </Link>
+            <SidebarTrigger className="hidden md:flex" />
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
@@ -74,9 +76,6 @@ export function MainLayout({ children }: { children: ReactNode }) {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="hidden md:flex">
-             <SidebarTrigger />
-          </SidebarFooter>
           <SidebarRail />
         </Sidebar>
         <SidebarInset>{children}</SidebarInset>
