@@ -16,8 +16,10 @@ import {
   SidebarTrigger,
   SidebarFooter,
   SidebarRail,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { Settings, LayoutDashboard, Link2, BookOpen, Bot } from "lucide-react";
+import { Settings, LayoutDashboard, Link2, BookOpen, Bot, BrainCircuit } from "lucide-react";
 import { Logo } from "@/components/icons";
 
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -61,6 +63,13 @@ export function MainLayout({ children }: { children: ReactNode }) {
                     <span>Agentic</span>
                   </Link>
                 </SidebarMenuButton>
+                 <SidebarMenuSub>
+                  <li>
+                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/fine-tuning")}>
+                        <Link href="/agentic/fine-tuning"><BrainCircuit /> Fine-Tuning</Link>
+                    </SidebarMenuSubButton>
+                  </li>
+                 </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton

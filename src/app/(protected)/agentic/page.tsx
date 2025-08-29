@@ -66,6 +66,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { WorkflowBuilder } from "@/components/agentic/workflow-builder";
 import type { Agent, WorkflowTemplate } from "@/lib/types";
+import Link from "next/link";
 
 
 const initialAgents: Agent[] = [
@@ -413,8 +414,8 @@ export default function AgenticPage() {
                         <CardDescription>Train agents on your specific data for improved accuracy.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button variant="outline" className="w-full neo-button" disabled>
-                            Launch Fine-Tuning Job
+                        <Button asChild variant="outline" className="w-full neo-button">
+                            <Link href="/agentic/fine-tuning">Launch Fine-Tuning Job</Link>
                         </Button>
                     </CardContent>
                 </Card>

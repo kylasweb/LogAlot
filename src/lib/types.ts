@@ -1,4 +1,5 @@
 
+
 export interface AnalysisReport {
   id: string;
   timestamp: string;
@@ -40,4 +41,16 @@ export interface WorkflowTemplate {
   id: string;
   name: string;
   agents: string[]; // array of agent IDs
+}
+
+export interface FineTuningJob {
+    id: string;
+    agentName: string;
+    baseModel: string;
+    dataset: string;
+    status: 'queued' | 'running' | 'completed' | 'failed';
+    progress: number;
+    createdAt: Date;
+    fineTunedModelId?: string;
+    error?: string;
 }
