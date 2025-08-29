@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { Bot, GripVertical, Plus, ArrowRight, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,20 +43,14 @@ const WorkflowStep = ({ agent, index, isDragDisabled }: { agent: Agent, index: n
   </Draggable>
 );
 
-export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, isCustomMode }: { allAgents: Agent[], activeWorkflow: Agent[], setActiveWorkflow: (agents: Agent[]) => void, isCustomMode: boolean }) {
-
+// This component uses react-beautiful-dnd which is not fully compatible with React 18 Strict Mode.
+// A wrapper is needed to ensure it only renders on the client and avoids strict mode double-rendering issues.
+function WorkflowDndContainer({ allAgents, activeWorkflow, setActiveWorkflow, isCustomMode }: { allAgents: Agent[], activeWorkflow: Agent[], setActiveWorkflow: (agents: Agent[]) => void, isCustomMode: boolean }) {
   const onDragEnd: OnDragEndResponder = (result) => {
-    // Dropped outside the list or not in custom mode
     if (!result.destination || !isCustomMode) {
       return;
     }
-
-    const items = reorder(
-      activeWorkflow,
-      result.source.index,
-      result.destination.index
-    );
-    
+    const items = reorder(activeWorkflow, result.source.index, result.destination.index);
     setActiveWorkflow(items);
   };
   
@@ -71,7 +65,6 @@ export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, 
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Workflow Canvas */}
         <div className="md:col-span-2 p-4 bg-muted/50 rounded-lg neo-inset min-h-[300px] relative">
             {!isCustomMode && (
                 <div className="absolute inset-0 bg-background/50 z-10 flex flex-col items-center justify-center rounded-lg">
@@ -111,7 +104,6 @@ export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, 
             </DragDropContext>
         </div>
 
-        {/* Available Agents Panel */}
         <div className={`p-4 border rounded-lg neo-outset ${!isCustomMode ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <h3 className="font-headline text-lg mb-4">Available Agents</h3>
             <div className="space-y-2">
@@ -130,4 +122,27 @@ export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, 
         </div>
     </div>
   );
+}
+
+
+export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, isCustomMode }: { allAgents: Agent[], activeWorkflow: Agent[], setActiveWorkflow: (agents: Agent[]) => void, isCustomMode: boolean }) {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    // Render the DragDropContext only on the client side
+    if (!isClient) {
+        return null;
+    }
+
+    return (
+        <WorkflowDndContainer
+            allAgents={allAgents}
+            activeWorkflow={activeWorkflow}
+            setActiveWorkflow={setActiveWorkflow}
+            isCustomMode={isCustomMode}
+        />
+    );
 }

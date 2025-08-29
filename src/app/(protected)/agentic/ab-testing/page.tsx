@@ -42,6 +42,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 import type { Agent } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 interface ABTestExperiment {
   id: string;
@@ -102,7 +103,7 @@ function CreateExperimentForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
             <Label htmlFor="experiment-name">Experiment Name</Label>
-            <input id="experiment-name" value={experimentName} onChange={(e) => setExperimentName(e.target.value)} placeholder="e.g., Test new prompt for Summarizer" required className="w-full neo-inset p-2 rounded-md bg-background" />
+            <Input id="experiment-name" value={experimentName} onChange={(e) => setExperimentName(e.target.value)} placeholder="e.g., Test new prompt for Summarizer" required className="neo-inset" />
         </div>
         <div className="space-y-2">
             <Label htmlFor="agent-select">Select Agent to Test</Label>

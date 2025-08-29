@@ -222,7 +222,7 @@ const AgentForm = ({ agent, onSave }: { agent?: Agent, onSave: (agent: Agent) =>
             Cancel
           </Button>
         </DialogClose>
-        <Button type="submit" className="neo-button"><Save className="mr-2"/> Save Agent</Button>
+        <Button type="submit" className="neo-button"><Save className="mr-2 h-4 w-4"/> Save Agent</Button>
       </DialogFooter>
     </form>
   );
@@ -340,7 +340,7 @@ export default function AgenticPage() {
           </h1>
         </div>
         <Button onClick={handleCreate} className="neo-button">
-          <Plus className="mr-2" /> Create New Agent
+          <Plus className="mr-2 h-4 w-4" /> Create New Agent
         </Button>
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
@@ -360,7 +360,7 @@ export default function AgenticPage() {
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
-                        <CardTitle className="font-headline flex items-center gap-2"><Network /> Agent Workflow Builder</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><Network className="w-6 h-6" /> Agent Workflow Builder</CardTitle>
                         <CardDescription>Visually construct and reorder your analysis pipeline. Active changes are saved automatically.</CardDescription>
                     </div>
                      <div className="flex items-center gap-4">
@@ -396,7 +396,7 @@ export default function AgenticPage() {
 
         <div className="space-y-4">
             <h2 className="text-2xl font-headline font-semibold">AI Agent Roster</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {agents.map((agent) => (
                     <AgentCard key={agent.id} agent={agent} onEdit={handleEdit} onDelete={handleDelete} onClone={handleClone} />
                 ))}
@@ -410,7 +410,7 @@ export default function AgenticPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><BrainCircuit /> Fine-Tuning</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><BrainCircuit className="w-5 h-5" /> Fine-Tuning</CardTitle>
                         <CardDescription>Train agents on your specific data for improved accuracy.</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -421,7 +421,7 @@ export default function AgenticPage() {
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><FlaskConical /> A/B Testing</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><FlaskConical className="w-5 h-5" /> A/B Testing</CardTitle>
                         <CardDescription>Test different models or prompts against each other.</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -432,7 +432,7 @@ export default function AgenticPage() {
                 </Card>
                  <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><WandSparkles /> Hyper-Parameters</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><WandSparkles className="w-5 h-5" /> Hyper-Parameters</CardTitle>
                         <CardDescription>Adjust advanced settings like temperature and top-k.</CardDescription>
                     </CardHeader>
                     <CardContent>
