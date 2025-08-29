@@ -17,7 +17,7 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Settings, LayoutDashboard, Link2 } from "lucide-react";
+import { Settings, LayoutDashboard, Link2, BookOpen } from "lucide-react";
 import { Logo } from "@/components/icons";
 
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -47,6 +47,18 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   <Link href="/">
                     <LayoutDashboard />
                     <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith("/kb")}
+                  tooltip={{ children: "Knowledge Base" }}
+                >
+                  <Link href="/kb">
+                    <BookOpen />
+                    <span>Knowledge Base</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
