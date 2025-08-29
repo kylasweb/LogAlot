@@ -29,34 +29,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-const mockSettings = [
+const settingsConfig = [
   {
     group: "Gemini",
     settings: [
       {
         key: "gemini_api_key",
-        value: "gsk-...",
         description: "API key for Gemini services.",
+        isSecret: true,
       },
       {
         key: "gemini_model",
         value: "gemini-2.5-flash",
         description: "Default model for analysis.",
-      },
-    ],
-  },
-  {
-    group: "OpenAI",
-    settings: [
-      {
-        key: "openai_api_key",
-        value: "sk-...",
-        description: "API key for OpenAI services.",
-      },
-      {
-        key: "openai_model",
-        value: "gpt-4-turbo",
-        description: "Default model for analysis.",
+        isSecret: false,
       },
     ],
   },
@@ -65,28 +51,14 @@ const mockSettings = [
     settings: [
       {
         key: "groq_api_key",
-        value: "gsk-...",
         description: "API key for Groq services.",
+        isSecret: true,
       },
       {
         key: "groq_model",
         value: "llama3-70b-8192",
         description: "Default model for analysis.",
-      },
-    ],
-  },
-  {
-    group: "HuggingFace",
-    settings: [
-      {
-        key: "huggingface_api_key",
-        value: "hf-...",
-        description: "API key for HuggingFace Inference.",
-      },
-      {
-        key: "huggingface_model",
-        value: "mistralai/Mistral-7B-Instruct-v0.2",
-        description: "Default model for analysis.",
+        isSecret: false,
       },
     ],
   },
@@ -112,11 +84,11 @@ export default function SettingsPage() {
                 AI Provider Configuration
               </CardTitle>
               <CardDescription>
-                Manage API keys and settings for various AI providers.
+                Manage API keys and settings for various AI providers. Keys are stored securely and are not displayed here.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              {mockSettings.map((group) => (
+              {settingsConfig.map((group) => (
                 <SettingsGroup key={group.group} {...group} />
               ))}
             </CardContent>
@@ -132,15 +104,14 @@ function SettingsGroup({
   settings,
 }: {
   group: string;
-  settings: { key: string; value: string; description: string }[];
+  settings: { key: string; value?: string; description: string, isSecret: boolean }[];
 }) {
   return (
     <div>
       <h3 className="text-lg font-semibold font-headline mb-4">{group}</h3>
       <div className="space-y-4">
         {settings.map((setting) => {
-          const { key, ...settingProps } = setting;
-          return <SettingInput key={key} settingKey={key} {...settingProps} />
+          return <SettingInput key={setting.key} {...setting} />
         })}
       </div>
     </div>
@@ -148,22 +119,23 @@ function SettingsGroup({
 }
 
 function SettingInput({
-  settingKey,
+  key,
   value,
   description,
+  isSecret,
 }: {
-  settingKey: string;
-  value: string;
+  key: string;
+  value?: string;
   description: string;
+  isSecret: boolean;
 }) {
-  const isSecret = settingKey.includes("api_key");
   const [showSecret, setShowSecret] = useState(false);
   const { toast } = useToast();
 
   const handleTest = () => {
     toast({
       title: "Testing Key...",
-      description: `Pinging ${settingKey} endpoint.`,
+      description: `Pinging ${key} endpoint.`,
     });
     // Mock API call to /api/settings/test
     setTimeout(() => {
@@ -171,13 +143,13 @@ function SettingInput({
       if (success) {
         toast({
           title: "Connection Successful",
-          description: `The key for ${settingKey} is valid.`,
+          description: `The key for ${key} is valid.`,
         });
       } else {
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: `The key for ${settingKey} is invalid or the service is down.`,
+          description: `The key for ${key} is invalid or the service is down.`,
         });
       }
     }, 1500);
@@ -186,17 +158,18 @@ function SettingInput({
   return (
     <div className="grid md:grid-cols-3 items-center gap-4">
       <div className="md:col-span-1">
-        <Label htmlFor={settingKey} className="font-medium">
-          {settingKey.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+        <Label htmlFor={key} className="font-medium">
+          {key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
         </Label>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
       <div className="md:col-span-2 flex items-center gap-2">
         <div className="relative w-full">
           <Input
-            id={settingKey}
-            defaultValue={value}
+            id={key}
+            defaultValue={isSecret ? "••••••••••••••••" : value}
             type={isSecret && !showSecret ? "password" : "text"}
+            readOnly={isSecret}
           />
           {isSecret && (
             <Button
