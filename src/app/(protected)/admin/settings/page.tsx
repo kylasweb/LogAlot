@@ -120,8 +120,8 @@ function SettingsGroup({
     <div>
       <h3 className="text-lg font-semibold font-headline mb-4">{group}</h3>
       <div className="space-y-4">
-        {settings.map((setting) => (
-          <SettingInput key={setting.key} {...setting} />
+        {settings.map(({ key, ...settingProps }) => (
+          <SettingInput key={key} settingKey={key} {...settingProps} />
         ))}
       </div>
     </div>
@@ -129,11 +129,11 @@ function SettingsGroup({
 }
 
 function SettingInput({
-  key: settingKey,
+  settingKey,
   value,
   description,
 }: {
-  key: string;
+  settingKey: string;
   value: string;
   description: string;
 }) {
