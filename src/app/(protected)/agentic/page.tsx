@@ -54,6 +54,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { WorkflowBuilder } from "@/components/agentic/workflow-builder";
 
 
 const initialAgents = [
@@ -239,13 +240,11 @@ export default function AgenticPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><Network /> Agent Workflow</CardTitle>
-                <CardDescription>Drag and drop agents to define the execution order for the analysis pipeline.</CardDescription>
+                <CardTitle className="font-headline flex items-center gap-2"><Network /> Agent Workflow Builder</CardTitle>
+                <CardDescription>Visually construct and reorder your analysis pipeline by dragging and dropping agents.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="p-4 bg-muted/50 rounded-lg neo-inset">
-                    <p className="text-center text-muted-foreground">Workflow visualization coming soon.</p>
-                </div>
+              <WorkflowBuilder agents={agents} />
             </CardContent>
         </Card>
 
@@ -303,3 +302,5 @@ export default function AgenticPage() {
     </div>
   );
 }
+
+    
