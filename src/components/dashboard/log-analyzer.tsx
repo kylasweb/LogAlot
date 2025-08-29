@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,8 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { WandSparkles, Loader2 } from "lucide-react";
+import { WandSparkles, Loader2, Upload } from "lucide-react";
 import { analyzeLogsAction } from "@/app/actions";
 import { AnalysisDisplay } from "./analysis-display";
 import type { AnalysisReport } from "@/lib/types";
@@ -47,6 +48,7 @@ export function LogAnalyzer() {
   const [analysis, setAnalysis] = useState<AnalysisReport | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,6 +58,18 @@ export function LogAnalyzer() {
       template: templates[0].id,
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        form.setValue("logs", text);
+      };
+      reader.readAsText(file);
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -104,10 +118,28 @@ export function LogAnalyzer() {
                 name="logs"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Paste Logs Here</FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Paste Logs Here</FormLabel>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        className="neo-button"
+                        onClick={() => fileInputRef.current?.click()}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload File
+                      </Button>
+                      <Input 
+                        type="file" 
+                        ref={fileInputRef}
+                        className="hidden" 
+                        onChange={handleFileChange}
+                        accept=".log,.txt,text/plain"
+                      />
+                    </div>
                     <FormControl>
                       <Textarea
-                        placeholder="Paste your error logs, including stack traces..."
+                        placeholder="Paste your error logs, including stack traces, or upload a file."
                         className="min-h-[300px] font-code text-xs neo-inset"
                         {...field}
                       />
