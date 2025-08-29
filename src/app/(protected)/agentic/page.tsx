@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -27,7 +27,9 @@ import {
   FlaskConical,
   WandSparkles,
   Save,
-  Network
+  Network,
+  GitBranch,
+  Info
 } from "lucide-react";
 import {
   Card,
@@ -37,12 +39,20 @@ import {
   CardTitle,
   CardFooter
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -55,9 +65,10 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { WorkflowBuilder } from "@/components/agentic/workflow-builder";
+import type { Agent, WorkflowTemplate } from "@/lib/types";
 
 
-const initialAgents = [
+const initialAgents: Agent[] = [
   {
     id: "summarizer",
     name: "Summarizer Agent",
@@ -100,10 +111,35 @@ const initialAgents = [
     instructions: 'You are a QA Engineer. Based on the error report, create a set of test cases to verify the fix and prevent regressions. Include positive, negative, and edge cases.',
     model: 'gemini-2.5-flash',
   },
+  {
+    id: 'customer-comms',
+    name: 'Customer Comms Agent',
+    description: 'Drafts a non-technical explanation for customer support.',
+    instructions: 'You are a customer support manager. Draft an empathetic, non-technical explanation of the issue for a customer, focusing on reassurance and resolution status.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'postmortem-writer',
+    name: 'Postmortem Writer Agent',
+    description: 'Generates a formal postmortem document for incident review.',
+    instructions: 'You are a technical writer specializing in incident postmortems. Structure the full analysis into a formal report with sections for Summary, Impact, Root Cause, Resolution, and Action Items.',
+    model: 'gemini-2.5-flash',
+  }
+];
+
+const workflowTemplates: WorkflowTemplate[] = [
+    { id: 'custom', name: 'Custom Workflow', agents: [] },
+    { id: 'default', name: 'Standard DevOps Analysis', agents: ['summarizer', 'traceback', 'solution'] },
+    { id: 'security', name: 'Security-Focused Analysis', agents: ['summarizer', 'security-analyst', 'solution'] },
+    { id: 'support', name: 'Customer Support Triage', agents: ['summarizer', 'customer-comms'] },
+    { id: 'qa', name: 'QA & Test Generation', agents: ['summarizer', 'traceback', 'qa-engineer'] },
+    { id: 'full-incident', name: 'Full Incident Response', agents: ['summarizer', 'traceback', 'solution', 'sre-ticketing', 'postmortem-writer'] },
+    { id: 'quick-look', name: 'Quick Look Summary', agents: ['summarizer'] },
 ];
 
 
-const AgentCard = ({ agent, onEdit, onDelete, onClone }: { agent: any, onEdit: (agent: any) => void, onDelete: (id: string) => void, onClone: (agent: any) => void }) => (
+
+const AgentCard = ({ agent, onEdit, onDelete, onClone }: { agent: Agent, onEdit: (agent: Agent) => void, onDelete: (id: string) => void, onClone: (agent: Agent) => void }) => (
   <Card className="neo-outset flex flex-col">
     <CardHeader>
       <div className="flex justify-between items-start">
@@ -150,7 +186,7 @@ const AgentCard = ({ agent, onEdit, onDelete, onClone }: { agent: any, onEdit: (
 );
 
 
-const AgentForm = ({ agent, onSave }: { agent?: any, onSave: (agent: any) => void }) => {
+const AgentForm = ({ agent, onSave }: { agent?: Agent, onSave: (agent: Agent) => void }) => {
   const [name, setName] = useState(agent?.name || "");
   const [description, setDescription] = useState(agent?.description || "");
   const [instructions, setInstructions] = useState(agent?.instructions || "");
@@ -158,7 +194,7 @@ const AgentForm = ({ agent, onSave }: { agent?: any, onSave: (agent: any) => voi
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ ...agent, name, description, instructions, model });
+    onSave({ ...agent, id: agent?.id || `agent_${Date.now()}`, name, description, instructions, model });
   };
 
   return (
@@ -192,17 +228,59 @@ const AgentForm = ({ agent, onSave }: { agent?: any, onSave: (agent: any) => voi
 }
 
 export default function AgenticPage() {
-  const [agents, setAgents] = useState(initialAgents);
-  const [editingAgent, setEditingAgent] = useState<any | undefined>(undefined);
+  const [agents, setAgents] = useState<Agent[]>(initialAgents);
+  const [editingAgent, setEditingAgent] = useState<Agent | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
+  
+  const [activeWorkflow, setActiveWorkflow] = useState<Agent[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('default');
+  const [isSyncEnabled, setIsSyncEnabled] = useState<boolean>(true);
 
-  const handleSaveAgent = (agentData: any) => {
-    if (agentData.id) {
+
+  useEffect(() => {
+    // Load state from localStorage on mount
+    const savedSync = localStorage.getItem('agentic_syncEnabled');
+    setIsSyncEnabled(savedSync ? JSON.parse(savedSync) : true);
+
+    const savedTemplateId = localStorage.getItem('agentic_selectedTemplateId');
+    const template = workflowTemplates.find(t => t.id === savedTemplateId) || workflowTemplates.find(t => t.id === 'default')!;
+    setSelectedTemplateId(template.id);
+    
+    if (template.id === 'custom') {
+        const savedCustomWorkflow = localStorage.getItem('agentic_customWorkflow');
+        if (savedCustomWorkflow) {
+            const customAgentIds: string[] = JSON.parse(savedCustomWorkflow);
+            const workflowAgents = customAgentIds.map(id => agents.find(a => a.id === id)).filter(Boolean) as Agent[];
+            setActiveWorkflow(workflowAgents);
+        }
+    } else {
+        const workflowAgents = template.agents.map(id => agents.find(a => a.id === id)).filter(Boolean) as Agent[];
+        setActiveWorkflow(workflowAgents);
+    }
+  }, [agents]);
+
+  useEffect(() => {
+    // Save state to localStorage whenever it changes
+    localStorage.setItem('agentic_syncEnabled', JSON.stringify(isSyncEnabled));
+    if (isSyncEnabled) {
+        localStorage.setItem('agentic_selectedTemplateId', selectedTemplateId);
+        if (selectedTemplateId === 'custom') {
+            localStorage.setItem('agentic_customWorkflow', JSON.stringify(activeWorkflow.map(a => a.id)));
+        } else {
+            // Remove custom workflow when a template is active
+            localStorage.removeItem('agentic_customWorkflow');
+        }
+    }
+  }, [isSyncEnabled, selectedTemplateId, activeWorkflow]);
+
+
+  const handleSaveAgent = (agentData: Agent) => {
+    if (agents.find(a => a.id === agentData.id)) {
       setAgents(agents.map(a => a.id === agentData.id ? agentData : a));
       toast({ title: "Agent Updated", description: `${agentData.name} has been saved.` });
     } else {
-      const newAgent = { ...agentData, id: `agent_${Date.now()}` };
+      const newAgent = { ...agentData, id: agentData.id || `agent_${Date.now()}` };
       setAgents([...agents, newAgent]);
       toast({ title: "Agent Created", description: `${newAgent.name} has been added to your team.` });
     }
@@ -210,7 +288,7 @@ export default function AgenticPage() {
     setEditingAgent(undefined);
   };
   
-  const handleEdit = (agent: any) => {
+  const handleEdit = (agent: Agent) => {
     setEditingAgent(agent);
     setIsFormOpen(true);
   }
@@ -226,12 +304,30 @@ export default function AgenticPage() {
   }
 
 
-  const handleClone = (agent: any) => {
+  const handleClone = (agent: Agent) => {
     const clonedAgent = { ...agent, name: `${agent.name} (Clone)`, id: `agent_${Date.now()}` };
     setAgents([...agents, clonedAgent]);
     toast({ title: "Agent Cloned", description: `${clonedAgent.name} has been created.` });
   }
 
+  const handleTemplateChange = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    if (templateId === 'custom') {
+        // If switching to custom, start with an empty workflow or a saved one
+        const savedCustomWorkflow = localStorage.getItem('agentic_customWorkflow');
+        if (savedCustomWorkflow) {
+             const customAgentIds: string[] = JSON.parse(savedCustomWorkflow);
+             const workflowAgents = customAgentIds.map(id => agents.find(a => a.id === id)).filter(Boolean) as Agent[];
+             setActiveWorkflow(workflowAgents);
+        } else {
+            setActiveWorkflow([]);
+        }
+    } else {
+        const template = workflowTemplates.find(t => t.id === templateId)!;
+        const workflowAgents = template.agents.map(id => agents.find(a => a.id === id)).filter(Boolean) as Agent[];
+        setActiveWorkflow(workflowAgents);
+    }
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -261,11 +357,38 @@ export default function AgenticPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><Network /> Agent Workflow Builder</CardTitle>
-                <CardDescription>Visually construct and reorder your analysis pipeline by dragging and dropping agents.</CardDescription>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle className="font-headline flex items-center gap-2"><Network /> Agent Workflow Builder</CardTitle>
+                        <CardDescription>Visually construct and reorder your analysis pipeline. Active changes are saved automatically.</CardDescription>
+                    </div>
+                     <div className="flex items-center gap-4">
+                        <div className="flex items-center space-x-2">
+                            <Switch id="sync-dashboard" checked={isSyncEnabled} onCheckedChange={setIsSyncEnabled} />
+                            <Label htmlFor="sync-dashboard" className="flex items-center gap-1">Sync with Dashboard <Info className="w-3 h-3 text-muted-foreground" title="When enabled, the workflow here will be used for log analysis."/></Label>
+                        </div>
+                        <Select value={selectedTemplateId} onValueChange={handleTemplateChange}>
+                            <SelectTrigger className="w-[280px] neo-button">
+                                <SelectValue placeholder="Select a workflow template" />
+                            </SelectTrigger>
+                            <SelectContent className="neo-outset">
+                                {workflowTemplates.map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                    {template.name}
+                                </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
             </CardHeader>
             <CardContent>
-              <WorkflowBuilder agents={agents} />
+              <WorkflowBuilder 
+                allAgents={agents} 
+                activeWorkflow={activeWorkflow}
+                setActiveWorkflow={setActiveWorkflow}
+                isCustomMode={selectedTemplateId === 'custom'}
+              />
             </CardContent>
         </Card>
 
@@ -297,7 +420,7 @@ export default function AgenticPage() {
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><FlaskConical /> A/B Testing</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><GitBranch /> A/B Testing</CardTitle>
                         <CardDescription>Test different models or prompts against each other.</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -323,5 +446,3 @@ export default function AgenticPage() {
     </div>
   );
 }
-
-    

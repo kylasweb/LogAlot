@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,32 +31,88 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { WandSparkles, Loader2, Upload } from "lucide-react";
+import { WandSparkles, Loader2, Upload, GitBranch } from "lucide-react";
 import { analyzeLogsAction } from "@/app/actions";
 import { AnalysisDisplay } from "./analysis-display";
-import type { AnalysisReport } from "@/lib/types";
+import type { AnalysisReport, Agent, Workflow, WorkflowTemplate } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { templates } from "@/lib/templates";
 import { AiTeamAnimation } from "./ai-team-animation";
+import { Switch } from "@/components/ui/switch";
+
 
 const formSchema = z.object({
   logs: z.string().min(50, "Please provide at least 50 characters of log data."),
-  includeTraceback: z.boolean().default(true),
   template: z.string().default(templates[0].id),
 });
+
+
+const initialAgents: Agent[] = [
+  {
+    id: "summarizer",
+    name: "Summarizer Agent",
+    description: "Reads raw logs and creates a high-level summary of the issue.",
+    instructions: "...",
+    model: "gemini-2.5-flash",
+  },
+  {
+    id: "traceback",
+    name: "Traceback Agent",
+    description: "Parses stack traces to identify the exception type and key frames.",
+    instructions: "...",
+    model: "gemini-2.5-flash",
+  },
+  {
+    id: "solution",
+    name: "Solution Agent",
+    description: "Generates a potential fix, including code snippets and verification steps.",
+    instructions: "...",
+    model: "gemini-2.5-flash",
+  },
+];
+
+
+const workflowTemplates: WorkflowTemplate[] = [
+    { id: 'custom', name: 'Custom Workflow', agents: [] },
+    { id: 'default', name: 'Standard DevOps Analysis', agents: ['summarizer', 'traceback', 'solution'] },
+    { id: 'security', name: 'Security-Focused Analysis', agents: ['summarizer', 'security-analyst', 'solution'] },
+    { id: 'support', name: 'Customer Support Triage', agents: ['summarizer', 'customer-comms'] },
+    { id: 'qa', name: 'QA & Test Generation', agents: ['summarizer', 'traceback', 'qa-engineer'] },
+    { id: 'full-incident', name: 'Full Incident Response', agents: ['summarizer', 'traceback', 'solution', 'sre-ticketing', 'postmortem-writer'] },
+    { id: 'quick-look', name: 'Quick Look Summary', agents: ['summarizer'] },
+];
 
 export function LogAnalyzer() {
   const [analysis, setAnalysis] = useState<AnalysisReport | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [workflow, setWorkflow] = useState<Workflow>({ agents: [] });
+
+
+  useEffect(() => {
+    // Load the active workflow from localStorage
+    const syncEnabled = localStorage.getItem('agentic_syncEnabled') === 'true';
+    if (syncEnabled) {
+        const templateId = localStorage.getItem('agentic_selectedTemplateId');
+        if (templateId === 'custom') {
+            const customAgentIds: string[] = JSON.parse(localStorage.getItem('agentic_customWorkflow') || '[]');
+            setWorkflow({ agents: customAgentIds.map(id => initialAgents.find(a => a.id === id)).filter(Boolean) as Agent[] });
+        } else {
+            const template = workflowTemplates.find(t => t.id === templateId) || workflowTemplates.find(t => t.id === 'default')!;
+            setWorkflow({ agents: template.agents.map(id => initialAgents.find(a => a.id === id)).filter(Boolean) as Agent[] });
+        }
+    } else {
+        // Fallback to a default workflow if sync is disabled
+        const defaultTemplate = workflowTemplates.find(t => t.id === 'default')!;
+        setWorkflow({ agents: defaultTemplate.agents.map(id => initialAgents.find(a => a.id === id)).filter(Boolean) as Agent[] });
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       logs: "",
-      includeTraceback: true,
       template: templates[0].id,
     },
   });
@@ -77,13 +133,21 @@ export function LogAnalyzer() {
     setIsLoading(true);
     setAnalysis(null);
     try {
-      // Find the full template content to pass to the action
+      if (workflow.agents.length === 0) {
+        toast({
+          variant: "destructive",
+          title: "Empty Workflow",
+          description: "Your active workflow has no agents. Go to the Agentic page to build one.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       const selectedTemplate = templates.find(t => t.id === values.template);
       const result = await analyzeLogsAction({
         logs: values.logs,
-        includeTraceback: values.includeTraceback,
-        // Pass the prompt content to the backend
         templatePrompt: selectedTemplate?.prompt || "",
+        workflow: workflow,
       });
 
       if (result.error) {
@@ -159,7 +223,7 @@ export function LogAnalyzer() {
                 name="template"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Analysis Template</FormLabel>
+                    <FormLabel>Formatting Template</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="neo-button">
@@ -175,30 +239,9 @@ export function LogAnalyzer() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Choose a template to guide the AI in generating a response tailored to a specific DevOps task. This helps structure the output for creating a postmortem report, a developer bug ticket, or other common actions.
+                      The AI workflow will run first, and then the results will be formatted using this template. This helps structure the final output for a specific task.
                     </FormDescription>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="includeTraceback"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 neo-outset">
-                    <div className="space-y-1.5">
-                      <FormLabel>Integrate Traceback Analysis</FormLabel>
-                      <FormDescription>
-                        Enable this to have the AI specifically parse stack traces from the logs. This provides a more detailed breakdown of the error's origin and relevant code frames, leading to a more precise analysis.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />

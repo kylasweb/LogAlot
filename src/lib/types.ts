@@ -1,3 +1,4 @@
+
 export interface AnalysisReport {
   id: string;
   timestamp: string;
@@ -20,4 +21,23 @@ export interface AnalysisReport {
     relevantFrames: string[];
     analysis: string;
   };
+}
+
+
+export interface Agent {
+  id: string;
+  name: string;
+  description: string;
+  instructions: string;
+  model: string;
+}
+
+export interface Workflow {
+  agents: Agent[];
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  agents: string[]; // array of agent IDs
 }

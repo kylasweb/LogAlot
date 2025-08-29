@@ -1,12 +1,14 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
-import { Bot, GripVertical, Plus, ArrowRight } from 'lucide-react';
+import { Bot, GripVertical, Plus, ArrowRight, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import type { Agent } from '@/lib/types';
+
 
 // A simple utility to reorder a list
 const reorder = (list: any[], startIndex: number, endIndex: number) => {
@@ -17,17 +19,18 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 };
 
 // Represents a single step in the workflow
-const WorkflowStep = ({ agent, index, isDragDisabled }: { agent: any, index: number, isDragDisabled?: boolean }) => (
+const WorkflowStep = ({ agent, index, isDragDisabled }: { agent: Agent, index: number, isDragDisabled?: boolean }) => (
     <Draggable draggableId={agent.id} index={index} isDragDisabled={isDragDisabled}>
     {(provided, snapshot) => (
       <div
         ref={provided.innerRef}
         {...provided.draggableProps}
-        {...provided.dragHandleProps}
         className={`mb-4 transition-shadow ${snapshot.isDragging ? 'shadow-lg' : ''}`}
       >
         <Card className={`neo-outset p-4 flex items-center gap-4 ${isDragDisabled ? 'bg-muted/50' : 'bg-card'}`}>
-          {!isDragDisabled && <GripVertical className="h-5 w-5 text-muted-foreground" />}
+            <div {...provided.dragHandleProps} className={isDragDisabled ? 'cursor-not-allowed' : 'cursor-grab'}>
+                <GripVertical className="h-5 w-5 text-muted-foreground" />
+            </div>
           <Bot className="h-6 w-6 text-primary" />
           <div className="flex-grow">
             <h4 className="font-semibold">{agent.name}</h4>
@@ -40,58 +43,64 @@ const WorkflowStep = ({ agent, index, isDragDisabled }: { agent: any, index: num
   </Draggable>
 );
 
-export function WorkflowBuilder({ agents: allAgents }: { agents: any[] }) {
-  const [workflow, setWorkflow] = useState([allAgents[0], allAgents[1]]); // Start with a default workflow
+export function WorkflowBuilder({ allAgents, activeWorkflow, setActiveWorkflow, isCustomMode }: { allAgents: Agent[], activeWorkflow: Agent[], setActiveWorkflow: (agents: Agent[]) => void, isCustomMode: boolean }) {
 
   const onDragEnd: OnDragEndResponder = (result) => {
-    // Dropped outside the list
-    if (!result.destination) {
+    // Dropped outside the list or not in custom mode
+    if (!result.destination || !isCustomMode) {
       return;
     }
 
     const items = reorder(
-      workflow,
+      activeWorkflow,
       result.source.index,
       result.destination.index
     );
     
-    setWorkflow(items);
+    setActiveWorkflow(items);
   };
   
   const addAgentToWorkflow = (agentId: string) => {
     const agentToAdd = allAgents.find(a => a.id === agentId);
-    if(agentToAdd && !workflow.find(w => w.id === agentId)){
-        setWorkflow([...workflow, agentToAdd]);
+    if(agentToAdd && !activeWorkflow.find(w => w.id === agentId)){
+        setActiveWorkflow([...activeWorkflow, agentToAdd]);
     }
   }
 
-  const availableAgents = allAgents.filter(agent => !workflow.find(w => w.id === agent.id));
+  const availableAgents = allAgents.filter(agent => !activeWorkflow.find(w => w.id === agent.id));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Workflow Canvas */}
-        <div className="md:col-span-2 p-4 bg-muted/50 rounded-lg neo-inset min-h-[300px]">
+        <div className="md:col-span-2 p-4 bg-muted/50 rounded-lg neo-inset min-h-[300px] relative">
+            {!isCustomMode && (
+                <div className="absolute inset-0 bg-background/50 z-10 flex flex-col items-center justify-center rounded-lg">
+                    <Info className="w-8 h-8 text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground font-medium">Workflow is managed by the selected template.</p>
+                    <p className="text-muted-foreground text-sm">Switch to "Custom Workflow" to drag, drop, and edit.</p>
+                </div>
+            )}
             <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="workflow">
+                <Droppable droppableId="workflow" isDropDisabled={!isCustomMode}>
                 {(provided) => (
                     <div {...provided.droppableProps} ref={provided.innerRef} className="relative">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center h-full">
-                            <div className="w-px bg-border h-full" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center h-full">
+                            {activeWorkflow.map((_, index) => (
+                                <React.Fragment key={index}>
+                                    <div className="h-20" /> 
+                                    {index < activeWorkflow.length - 1 && <ArrowRight className="h-6 w-6 text-muted-foreground my-2 rotate-90" />}
+                                </React.Fragment>
+                            ))}
                         </div>
 
-                        {workflow.map((agent, index) => (
+                        {activeWorkflow.map((agent, index) => (
                             <div key={agent.id} className="relative flex items-center justify-center">
-                                <WorkflowStep agent={agent} index={index} />
-                                {index < workflow.length - 1 && (
-                                    <div className="absolute right-0 top-1/2 -translate-y-1/2 transform translate-x-full mx-4">
-                                        <ArrowRight className="h-6 w-6 text-muted-foreground" />
-                                    </div>
-                                )}
+                                <WorkflowStep agent={agent} index={index} isDragDisabled={!isCustomMode} />
                             </div>
                         ))}
                         {provided.placeholder}
                         
-                        {workflow.length === 0 && (
+                        {activeWorkflow.length === 0 && (
                             <div className="text-center text-muted-foreground p-8">
                                 <p>Drag agents from the right panel to build your workflow.</p>
                             </div>
@@ -103,14 +112,14 @@ export function WorkflowBuilder({ agents: allAgents }: { agents: any[] }) {
         </div>
 
         {/* Available Agents Panel */}
-        <div className="p-4 border rounded-lg neo-outset">
+        <div className={`p-4 border rounded-lg neo-outset ${!isCustomMode ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <h3 className="font-headline text-lg mb-4">Available Agents</h3>
             <div className="space-y-2">
                 {availableAgents.length > 0 ? availableAgents.map(agent => (
                     <Card key={agent.id} className="p-3 flex items-center gap-2">
                         <Bot className="h-5 w-5 text-primary" />
                         <span className="flex-grow text-sm font-medium">{agent.name}</span>
-                        <Button size="icon" variant="ghost" onClick={() => addAgentToWorkflow(agent.id)}>
+                        <Button size="icon" variant="ghost" onClick={() => addAgentToWorkflow(agent.id)} disabled={!isCustomMode}>
                             <Plus className="h-4 w-4" />
                         </Button>
                     </Card>
@@ -122,5 +131,3 @@ export function WorkflowBuilder({ agents: allAgents }: { agents: any[] }) {
     </div>
   );
 }
-
-    
