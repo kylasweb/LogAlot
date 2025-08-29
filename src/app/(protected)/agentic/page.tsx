@@ -421,12 +421,12 @@ export default function AgenticPage() {
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><GitBranch /> A/B Testing</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2"><FlaskConical /> A/B Testing</CardTitle>
                         <CardDescription>Test different models or prompts against each other.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button variant="outline" className="w-full neo-button" disabled>
-                            Create New Experiment
+                        <Button asChild variant="outline" className="w-full neo-button">
+                            <Link href="/agentic/ab-testing">Create New Experiment</Link>
                         </Button>
                     </CardContent>
                 </Card>
@@ -436,8 +436,8 @@ export default function AgenticPage() {
                         <CardDescription>Adjust advanced settings like temperature and top-k.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Button variant="outline" className="w-full neo-button" disabled>
-                            Configure Parameters
+                         <Button asChild variant="outline" className="w-full neo-button">
+                            <Link href="/agentic/hyper-parameters">Configure Parameters</Link>
                         </Button>
                     </CardContent>
                 </Card>

@@ -19,7 +19,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { Settings, LayoutDashboard, Link2, BookOpen, Bot, BrainCircuit } from "lucide-react";
+import { Settings, LayoutDashboard, Link2, BookOpen, Bot, BrainCircuit, FlaskConical, WandSparkles } from "lucide-react";
 import { Logo } from "@/components/icons";
 
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -55,7 +55,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
                <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith("/agentic")}
+                  isActive={pathname.startsWith("/agentic") && !pathname.includes('fine-tuning') && !pathname.includes('ab-testing') && !pathname.includes('hyper-parameters')}
                   tooltip={{ children: "Agentic" }}
                 >
                   <Link href="/agentic">
@@ -67,6 +67,16 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   <li>
                     <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/fine-tuning")}>
                         <Link href="/agentic/fine-tuning"><BrainCircuit /> Fine-Tuning</Link>
+                    </SidebarMenuSubButton>
+                  </li>
+                   <li>
+                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/ab-testing")}>
+                        <Link href="/agentic/ab-testing"><FlaskConical /> A/B Testing</Link>
+                    </SidebarMenuSubButton>
+                  </li>
+                   <li>
+                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/hyper-parameters")}>
+                        <Link href="/agentic/hyper-parameters"><WandSparkles /> Hyper-parameters</Link>
                     </SidebarMenuSubButton>
                   </li>
                  </SidebarMenuSub>
