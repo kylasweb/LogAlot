@@ -111,7 +111,8 @@ function SettingsGroup({
       <h3 className="text-lg font-semibold font-headline mb-4">{group}</h3>
       <div className="space-y-4">
         {settings.map((setting) => {
-          return <SettingInput key={setting.key} {...setting} />
+          const { key, ...rest } = setting;
+          return <SettingInput key={key} id={key} {...rest} />
         })}
       </div>
     </div>
@@ -119,12 +120,12 @@ function SettingsGroup({
 }
 
 function SettingInput({
-  key,
+  id,
   value,
   description,
   isSecret,
 }: {
-  key: string;
+  id: string;
   value?: string;
   description: string;
   isSecret: boolean;
@@ -135,7 +136,7 @@ function SettingInput({
   const handleTest = () => {
     toast({
       title: "Testing Key...",
-      description: `Pinging ${key} endpoint.`,
+      description: `Pinging ${id} endpoint.`,
     });
     // Mock API call to /api/settings/test
     setTimeout(() => {
@@ -143,13 +144,13 @@ function SettingInput({
       if (success) {
         toast({
           title: "Connection Successful",
-          description: `The key for ${key} is valid.`,
+          description: `The key for ${id} is valid.`,
         });
       } else {
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: `The key for ${key} is invalid or the service is down.`,
+          description: `The key for ${id} is invalid or the service is down.`,
         });
       }
     }, 1500);
@@ -158,15 +159,15 @@ function SettingInput({
   return (
     <div className="grid md:grid-cols-3 items-center gap-4">
       <div className="md:col-span-1">
-        <Label htmlFor={key} className="font-medium">
-          {key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+        <Label htmlFor={id} className="font-medium">
+          {id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
         </Label>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
       <div className="md:col-span-2 flex items-center gap-2">
         <div className="relative w-full">
           <Input
-            id={key}
+            id={id}
             defaultValue={isSecret ? "••••••••••••••••" : value}
             type={isSecret && !showSecret ? "password" : "text"}
             readOnly={isSecret}
