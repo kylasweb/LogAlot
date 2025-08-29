@@ -29,9 +29,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { WandSparkles, Loader2, Upload, GitBranch } from "lucide-react";
+import { WandSparkles, Loader2, Upload, GitBranch, FileText } from "lucide-react";
 import { analyzeLogsAction } from "@/app/actions";
 import { AnalysisDisplay } from "./analysis-display";
 import type { AnalysisReport, Agent, Workflow, WorkflowTemplate } from "@/lib/types";
@@ -196,9 +202,19 @@ export function LogAnalyzer() {
                     <div className="flex justify-between items-center">
                       <FormLabel>Paste Logs or Upload File</FormLabel>
                       <div className="flex items-center gap-2">
-                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('simple')}>Simple Log</Button>
-                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('complex')}>Complex Log</Button>
-                          <Button type="button" variant="outline" size="sm" className="neo-button" onClick={() => loadExample('confusing')}>Confusing Log</Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button type="button" variant="outline" size="sm" className="neo-button">
+                                <FileText className="mr-2 h-4 w-4" /> Load Example
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="neo-outset">
+                                <DropdownMenuItem onClick={() => loadExample('simple')}>Simple Log</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => loadExample('complex')}>Complex Log</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => loadExample('confusing')}>Confusing Log</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                           <Button 
                             type="button" 
                             variant="outline" 
