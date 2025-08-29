@@ -88,8 +88,8 @@ export default function ConnectorsPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {connector.fields.map((field) => (
-                  <ConnectorInput key={field.key} {...field} />
+                {connector.fields.map(({ key, ...fieldProps }) => (
+                  <ConnectorInput key={key} {...fieldProps} />
                 ))}
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" className="neo-button">
