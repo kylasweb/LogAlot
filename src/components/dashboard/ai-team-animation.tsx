@@ -62,11 +62,12 @@ const shuffleArray = (array: any[]) => {
 
 export function AiTeamAnimation() {
   const [currentLine, setCurrentLine] = useState(0);
-  const [conversation, setConversation] = useState(shuffleArray([...all_conversations]));
+  const [conversation, setConversation] = useState(all_conversations);
 
 
   useEffect(() => {
     // Reset and reshuffle when the component is actively shown
+    // This logic is client-side only to prevent hydration errors.
     setConversation(shuffleArray([...all_conversations]));
     setCurrentLine(0);
 
