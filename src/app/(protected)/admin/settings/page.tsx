@@ -105,21 +105,23 @@ export default function SettingsPage() {
         <UserMenu />
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">
-              AI Provider Configuration
-            </CardTitle>
-            <CardDescription>
-              Manage API keys and settings for various AI providers.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {mockSettings.map((group) => (
-              <SettingsGroup key={group.group} {...group} />
-            ))}
-          </CardContent>
-        </Card>
+        <div className="mx-auto max-w-4xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">
+                AI Provider Configuration
+              </CardTitle>
+              <CardDescription>
+                Manage API keys and settings for various AI providers.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {mockSettings.map((group) => (
+                <SettingsGroup key={group.group} {...group} />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );

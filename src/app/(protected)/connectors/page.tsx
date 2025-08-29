@@ -76,30 +76,32 @@ export default function ConnectorsPage() {
         <UserMenu />
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        {connectors.map((connector) => (
-          <Card key={connector.name} className="neo-outset">
-            <CardHeader className="flex flex-row items-center gap-4">
-              {connector.icon}
-              <div>
-                <CardTitle className="font-headline">{connector.name}</CardTitle>
-                <CardDescription>{connector.description}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {connector.fields.map((field) => (
-                <ConnectorInput key={field.key} {...field} />
-              ))}
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" className="neo-button">
-                  <TestTube className="mr-2" /> Test
-                </Button>
-                <Button className="neo-button">
-                  <Save className="mr-2" /> Save
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <div className="mx-auto max-w-4xl space-y-6">
+          {connectors.map((connector) => (
+            <Card key={connector.name} className="neo-outset">
+              <CardHeader className="flex flex-row items-center gap-4">
+                {connector.icon}
+                <div>
+                  <CardTitle className="font-headline">{connector.name}</CardTitle>
+                  <CardDescription>{connector.description}</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {connector.fields.map((field) => (
+                  <ConnectorInput key={field.key} {...field} />
+                ))}
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" className="neo-button">
+                    <TestTube className="mr-2" /> Test
+                  </Button>
+                  <Button className="neo-button">
+                    <Save className="mr-2" /> Save
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </main>
     </div>
   );

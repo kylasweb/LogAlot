@@ -30,7 +30,9 @@ export default function Home() {
           <UserMenu />
         </header>
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <LogAnalyzer />
+          <div className="mx-auto max-w-4xl">
+            <LogAnalyzer />
+          </div>
         </main>
       </div>
     </MainLayout>
