@@ -63,6 +63,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.13",
     "genkit-cli": "^1.14.1",
