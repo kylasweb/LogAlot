@@ -8,17 +8,20 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const agents = [
   {
-    name: "DevOps Manager",
+    name: "Anu",
+    title: "Project Lead",
     icon: <Briefcase className="w-6 h-6" />,
     style: "bg-blue-200 text-blue-800",
   },
   {
-    name: "Senior Developer",
+    name: "Akhil",
+    title: "Senior Developer",
     icon: <Code className="w-6 h-6" />,
     style: "bg-green-200 text-green-800",
   },
   {
-    name: "QA Engineer",
+    name: "Shincy",
+    title: "QA Engineer",
     icon: <TestTube className="w-6 h-6" />,
     style: "bg-yellow-200 text-yellow-800",
   },
@@ -92,15 +95,18 @@ export function AiTeamAnimation() {
                 {agent.icon}
               </AvatarFallback>
             </Avatar>
-            <span
-              className={`text-xs font-medium transition-all duration-300 ${
-                activeAgentIndex === index
-                  ? "text-foreground"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {agent.name}
-            </span>
+            <div className="text-center">
+               <p
+                className={`text-sm font-medium transition-all duration-300 ${
+                  activeAgentIndex === index
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {agent.name}
+              </p>
+               <p className="text-xs text-muted-foreground">{agent.title}</p>
+            </div>
           </div>
         ))}
       </div>

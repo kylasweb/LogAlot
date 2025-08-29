@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -25,14 +26,26 @@ import {
   ShieldCheck,
   TrendingUp,
   Siren,
-  Activity
+  Activity,
+  Users,
+  Code,
+  TestTube
 } from "lucide-react";
 import type { AnalysisReport } from "@/lib/types";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { useToast } from "@/hooks/use-toast";
+
+
+const team = [
+  { name: "Anu", title: "Project Lead", icon: <Briefcase /> },
+  { name: "Akhil", title: "Senior Developer", icon: <Code /> },
+  { name: "Shincy", title: "QA Engineer", icon: <TestTube /> },
+];
+
 
 function Markdown({ content }: { content: string }) {
   return (
@@ -129,6 +142,15 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
         
         <Section icon={<Lightbulb />} title="Executive Summary">
           <Markdown content={report.summary} />
+        </Section>
+        
+        <Separator />
+        <Section icon={<Users />} title="Analyzed by">
+            <div className="flex space-x-6">
+                {team.map((member) => (
+                    <TeamAvatar key={member.name} name={member.name} title={member.title} icon={member.icon} />
+                ))}
+            </div>
         </Section>
 
         {report.traceback && (
@@ -239,4 +261,21 @@ function InfoBox({
       <span className="text-sm font-semibold">{value}</span>
     </div>
   );
+}
+
+
+function TeamAvatar({ name, title, icon }: { name: string, title: string, icon: React.ReactNode }) {
+    return (
+        <div className="flex items-center gap-3">
+            <Avatar>
+                <AvatarFallback className="bg-secondary text-secondary-foreground">
+                    {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
+                </AvatarFallback>
+            </Avatar>
+            <div>
+                <p className="font-semibold text-sm">{name}</p>
+                <p className="text-xs text-muted-foreground">{title}</p>
+            </div>
+        </div>
+    )
 }
