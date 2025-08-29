@@ -67,6 +67,7 @@ import { useToast } from "@/hooks/use-toast";
 import { WorkflowBuilder } from "@/components/agentic/workflow-builder";
 import type { Agent, WorkflowTemplate } from "@/lib/types";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 
 const initialAgents: Agent[] = [
@@ -366,7 +367,17 @@ export default function AgenticPage() {
                      <div className="flex items-center gap-4">
                         <div className="flex items-center space-x-2">
                             <Switch id="sync-dashboard" checked={isSyncEnabled} onCheckedChange={setIsSyncEnabled} />
-                            <Label htmlFor="sync-dashboard" className="flex items-center gap-1">Sync with Dashboard <Info className="w-3 h-3 text-muted-foreground" title="When enabled, the workflow here will be used for log analysis."/></Label>
+                            <Label htmlFor="sync-dashboard" className="flex items-center gap-1">
+                                Sync with Dashboard
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Info className="w-3 h-3 text-muted-foreground"/>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>When enabled, the workflow here will be used for log analysis.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </Label>
                         </div>
                         <Select value={selectedTemplateId} onValueChange={handleTemplateChange}>
                             <SelectTrigger className="w-[280px] neo-button">
@@ -447,3 +458,5 @@ export default function AgenticPage() {
     </div>
   );
 }
+
+    
