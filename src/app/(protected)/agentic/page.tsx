@@ -79,6 +79,27 @@ const initialAgents = [
     instructions: "You are a senior software architect. Based on the error summary and traceback analysis, propose a concrete solution. Your solution must include a code snippet demonstrating the fix, a clear explanation of the change, and steps to verify the solution is effective.",
     model: "gemini-2.5-flash",
   },
+  {
+    id: 'sre-ticketing',
+    name: 'SRE Ticketing Agent',
+    description: 'Formats analysis into a standardized SRE ticket.',
+    instructions: 'You are an SRE specialist. Your task is to take an error analysis and format it into a structured ticket for an SRE team, including priority, suggested owner, and technical details.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'security-analyst',
+    name: 'Security Analyst Agent',
+    description: 'Analyzes logs for potential security vulnerabilities.',
+    instructions: 'You are a security expert. Analyze the provided logs for any signs of security vulnerabilities like SQL injection, XSS, or unauthorized access. If a threat is found, provide a detailed vulnerability report.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'qa-engineer',
+    name: 'QA Engineer Agent',
+    description: 'Generates test cases based on the identified error.',
+    instructions: 'You are a QA Engineer. Based on the error report, create a set of test cases to verify the fix and prevent regressions. Include positive, negative, and edge cases.',
+    model: 'gemini-2.5-flash',
+  },
 ];
 
 
