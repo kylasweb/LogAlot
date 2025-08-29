@@ -192,7 +192,7 @@ export default function ABTestingPage() {
         </Dialog>
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <Card>
+        <Card className="neo-outset">
           <CardHeader>
             <CardTitle>A/B Test Experiments</CardTitle>
             <CardDescription>

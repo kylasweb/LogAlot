@@ -50,11 +50,9 @@ const all_conversations = [
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = (array: any[]) => {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 };
@@ -66,14 +64,12 @@ export function AiTeamAnimation() {
 
 
   useEffect(() => {
-    // Reset and reshuffle when the component is actively shown
-    // This logic is client-side only to prevent hydration errors.
     setConversation(shuffleArray([...all_conversations]));
     setCurrentLine(0);
 
     const interval = setInterval(() => {
       setCurrentLine((prev) => (prev + 1) % conversation.length);
-    }, 2500); // Change message every 2.5 seconds
+    }, 2500);
 
     return () => clearInterval(interval);
   }, []);
