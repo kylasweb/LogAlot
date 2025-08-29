@@ -2,6 +2,7 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { LogAnalyzer } from "@/components/dashboard/log-analyzer";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { LogOut } from "lucide-react";
+import { LogOut, Link2 } from "lucide-react";
 
 export default function Home() {
   return (
@@ -40,7 +41,7 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full neo-button">
           <Avatar className="h-9 w-9">
             <AvatarImage
               src="https://picsum.photos/100"
@@ -51,7 +52,7 @@ function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56 neo-outset" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">Admin User</p>
@@ -60,6 +61,13 @@ function UserMenu() {
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/connectors">
+            <Link2 className="mr-2 h-4 w-4" />
+            <span>Connectors</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />

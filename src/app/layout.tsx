@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Error Insights AI',
+  title: 'LogAlot',
   description: 'Automated Error Analysis using AI',
 };
 

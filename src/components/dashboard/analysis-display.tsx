@@ -7,9 +7,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import {
   FileCode,
   FlaskConical,
@@ -18,12 +20,15 @@ import {
   CheckCircle,
   AlertTriangle,
   Zap,
+  Briefcase,
+  GitBranch,
 } from "lucide-react";
 import type { AnalysisReport } from "@/lib/types";
 
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { useToast } from "@/hooks/use-toast";
 
 function Markdown({ content }: { content: string }) {
   return (
@@ -68,8 +73,17 @@ function Markdown({ content }: { content: string }) {
 }
 
 export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
+  const { toast } = useToast();
+  
+  const handleShare = (platform: string) => {
+    toast({
+      title: `Sending to ${platform}...`,
+      description: `Your analysis report is being sent.`,
+    });
+  }
+
   return (
-    <Card className="w-full">
+    <Card className="w-full neo-outset">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">
           Analysis Report
@@ -95,7 +109,7 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
             label="Confidence"
             value={`${(report.confidenceScore * 100).toFixed(0)}%`}
           />
-          <div className="flex flex-col items-center justify-center space-y-2 p-4 bg-secondary/50 rounded-lg">
+          <div className="flex flex-col items-center justify-center space-y-2 p-4 bg-secondary/50 rounded-lg neo-inset">
             <div className="flex gap-2">
               {report.needsFix && (
                 <Badge variant="destructive">Fix Required</Badge>
@@ -114,10 +128,10 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
             icon={<AlertTriangle className="text-destructive" />}
             title="Traceback Summary"
           >
-            <p className="font-mono text-sm bg-destructive/10 text-destructive p-3 rounded-md">
+            <p className="font-mono text-sm bg-destructive/10 text-destructive p-3 rounded-md neo-inset">
               {report.traceback.exceptionType}
             </p>
-            <ul className="font-code text-xs space-y-1 mt-2 list-disc list-inside bg-muted/50 p-3 rounded-md">
+            <ul className="font-code text-xs space-y-1 mt-2 list-disc list-inside bg-muted/50 p-3 rounded-md neo-inset">
               {report.traceback.relevantFrames.map((frame, i) => (
                 <li key={i}>{frame}</li>
               ))}
@@ -144,6 +158,17 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
           <Markdown content={report.verification} />
         </Section>
       </CardContent>
+      <CardFooter className="gap-2 justify-end">
+          <Button variant="outline" className="neo-button" onClick={() => handleShare('Teams')}>
+              <Briefcase className="mr-2" /> Send to Teams
+          </Button>
+          <Button variant="outline" className="neo-button" onClick={() => handleShare('Jira')}>
+              <Briefcase className="mr-2" /> Create Jira Ticket
+          </Button>
+          <Button variant="outline" className="neo-button" onClick={() => handleShare('GitHub')}>
+              <GitBranch className="mr-2" /> Push to GitHub
+          </Button>
+      </CardFooter>
     </Card>
   );
 }
@@ -180,7 +205,7 @@ function InfoBox({
   value: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center space-y-1 p-4 bg-secondary/50 rounded-lg">
+    <div className="flex flex-col items-center justify-center space-y-1 p-4 bg-secondary/50 rounded-lg neo-inset">
       {React.cloneElement(icon as React.ReactElement, {
         className: "w-6 h-6 text-muted-foreground",
       })}

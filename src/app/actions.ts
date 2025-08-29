@@ -10,6 +10,7 @@ import { generateSolutionFromError } from "@/ai/flows/generate-solution-from-err
 const analyzeLogsSchema = z.object({
   logs: z.string(),
   includeTraceback: z.boolean(),
+  templatePrompt: z.string().optional(),
 });
 
 export async function analyzeLogsAction(
@@ -21,14 +22,17 @@ export async function analyzeLogsAction(
     return { data: null, error: "Invalid input." };
   }
   
-  const { logs, includeTraceback } = validatedFields.data;
+  const { logs, includeTraceback, templatePrompt } = validatedFields.data;
 
   try {
     const techStack = "Unknown";
     const environment = "production";
 
+    // Prepend the template prompt to the logs for summarization if it exists
+    const logsForSummary = templatePrompt ? `${templatePrompt}\n\nError Logs:\n${logs}` : logs;
+
     const summaryResult = await summarizeErrorLogs({
-      logs,
+      logs: logsForSummary,
       techStack,
       environment,
     });
@@ -41,28 +45,27 @@ export async function analyzeLogsAction(
         environment,
       });
     }
+    
+    // The analysis from the summary now incorporates the template
+    const analysis = summaryResult.summary;
 
     const solutionResult = await generateSolutionFromError({
-      analysis: tracebackResult?.analysis || summaryResult.summary,
+      analysis: analysis,
       techStack,
       environment,
       traceback: includeTraceback ? logs : undefined,
     });
     
-    // The verification step can be an LLM call as well, but for now we'll use a static placeholder
     const verification = "To verify the fix, apply the suggested code changes and run the relevant unit tests. If the issue is intermittent, monitor the logs for recurrence after deployment.";
-
 
     const analysisReport: AnalysisReport = {
       id: `analysis_${new Date().getTime()}`,
       timestamp: new Date().toISOString(),
       techStack: techStack,
       environment: environment,
-      analysis: tracebackResult?.analysis || summaryResult.summary,
+      analysis: analysis,
       proposedSolution: {
         description: solutionResult.solution,
-        // For now, we are assuming the solution contains a code block.
-        // A more robust solution would be to have the LLM separate description and code.
         code: solutionResult.solution.substring(solutionResult.solution.indexOf('```'), solutionResult.solution.lastIndexOf('```') + 3) || ""
       },
       verification: verification,

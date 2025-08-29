@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { Settings, LayoutDashboard } from "lucide-react";
+import { Settings, LayoutDashboard, Link2 } from "lucide-react";
 import { Logo } from "@/components/icons";
 
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -27,7 +27,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
             <Link href="/" className="flex items-center gap-2 px-2">
               <Logo className="w-8 h-8 text-primary" />
               <span className="font-headline text-lg font-semibold text-sidebar-foreground">
-                Error Insights
+                LogAlot
               </span>
             </Link>
           </SidebarHeader>
@@ -54,6 +54,18 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   <Link href="/admin/settings">
                     <Settings />
                     <span>Settings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith("/connectors")}
+                  tooltip={{ children: "Connectors" }}
+                >
+                  <Link href="/connectors">
+                    <Link2 />
+                    <span>Connectors</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

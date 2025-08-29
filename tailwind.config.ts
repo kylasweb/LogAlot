@@ -71,6 +71,12 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      boxShadow: {
+        'neo-inset': 'inset 5px 5px 10px #c5c9d2, inset -5px -5px 10px #ffffff',
+        'neo-outset': '5px 5px 10px #c5c9d2, -5px -5px 10px #ffffff',
+        'dark-neo-inset': 'inset 5px 5px 10px #1e2126, inset -5px -5px 10px #2a2d34',
+        'dark-neo-outset': '5px 5px 10px #1e2126, -5px -5px 10px #2a2d34',
+      },
       keyframes: {
         'accordion-down': {
           from: {

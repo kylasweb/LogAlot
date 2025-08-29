@@ -21,6 +21,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { WandSparkles, Loader2 } from "lucide-react";
@@ -28,10 +35,12 @@ import { analyzeLogsAction } from "@/app/actions";
 import { AnalysisDisplay } from "./analysis-display";
 import type { AnalysisReport } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { templates } from "@/lib/templates";
 
 const formSchema = z.object({
   logs: z.string().min(50, "Please provide at least 50 characters of log data."),
   includeTraceback: z.boolean().default(true),
+  template: z.string().default(templates[0].id),
 });
 
 export function LogAnalyzer() {
@@ -44,6 +53,7 @@ export function LogAnalyzer() {
     defaultValues: {
       logs: "",
       includeTraceback: true,
+      template: templates[0].id,
     },
   });
 
@@ -51,7 +61,15 @@ export function LogAnalyzer() {
     setIsLoading(true);
     setAnalysis(null);
     try {
-      const result = await analyzeLogsAction(values);
+      // Find the full template content to pass to the action
+      const selectedTemplate = templates.find(t => t.id === values.template);
+      const result = await analyzeLogsAction({
+        logs: values.logs,
+        includeTraceback: values.includeTraceback,
+        // Pass the prompt content to the backend
+        templatePrompt: selectedTemplate?.prompt || "",
+      });
+
       if (result.error) {
         toast({
           variant: "destructive",
@@ -74,7 +92,7 @@ export function LogAnalyzer() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-      <Card>
+      <Card className="neo-outset">
         <CardHeader>
           <CardTitle className="font-headline">Analyze Error Logs</CardTitle>
         </CardHeader>
@@ -90,7 +108,7 @@ export function LogAnalyzer() {
                     <FormControl>
                       <Textarea
                         placeholder="Paste your error logs, including stack traces..."
-                        className="min-h-[300px] font-code text-xs"
+                        className="min-h-[300px] font-code text-xs neo-inset"
                         {...field}
                       />
                     </FormControl>
@@ -98,11 +116,40 @@ export function LogAnalyzer() {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="template"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Analysis Template</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="neo-button">
+                          <SelectValue placeholder="Select a DevOps template" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="neo-outset">
+                        {templates.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose a template to structure the AI analysis.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="includeTraceback"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 neo-outset">
                     <div className="space-y-0.5">
                       <FormLabel>Integrate Traceback</FormLabel>
                       <FormDescription>
@@ -118,7 +165,8 @@ export function LogAnalyzer() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
+
+              <Button type="submit" className="w-full neo-button" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="animate-spin" />
                 ) : (
@@ -133,7 +181,7 @@ export function LogAnalyzer() {
 
       <div className="lg:sticky lg:top-20">
         {isLoading && (
-          <Card>
+          <Card className="neo-outset">
             <CardHeader>
               <CardTitle className="font-headline">
                 Analysis in Progress
@@ -149,7 +197,7 @@ export function LogAnalyzer() {
         )}
         {analysis && <AnalysisDisplay report={analysis} />}
         {!isLoading && !analysis && (
-          <Card>
+          <Card className="neo-outset">
             <CardHeader>
               <CardTitle className="font-headline">Awaiting Analysis</CardTitle>
             </CardHeader>
