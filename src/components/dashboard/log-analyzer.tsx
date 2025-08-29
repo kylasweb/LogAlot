@@ -105,7 +105,7 @@ export function LogAnalyzer() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <div className="grid grid-cols-1 gap-6">
       <Card className="neo-outset">
         <CardHeader>
           <CardTitle className="font-headline">Analyze Error Logs</CardTitle>
@@ -211,7 +211,7 @@ export function LogAnalyzer() {
         </CardContent>
       </Card>
 
-      <div className="lg:sticky lg:top-20">
+      <div className="space-y-6">
         {isLoading && (
           <Card className="neo-outset">
             <CardHeader>
