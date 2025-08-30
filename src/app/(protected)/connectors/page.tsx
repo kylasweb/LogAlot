@@ -28,6 +28,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const connectors = [
   {
@@ -78,6 +84,57 @@ export default function ConnectorsPage() {
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
         <div className="mx-auto max-w-6xl space-y-6">
+
+        <Card className="neo-outset">
+            <CardHeader>
+                <CardTitle className="font-headline">Configuration Guide</CardTitle>
+                <CardDescription>
+                    Instructions for finding the required credentials for each service.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="teams">
+                        <AccordionTrigger>Microsoft Teams Webhook URL</AccordionTrigger>
+                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                            <ol>
+                                <li>Navigate to the Teams channel where you want to receive notifications.</li>
+                                <li>Click on the three dots (More options) next to the channel name and select <strong>Connectors</strong>.</li>
+                                <li>Find <strong>Incoming Webhook</strong> and click <strong>Configure</strong>.</li>
+                                <li>Provide a name for the webhook (e.g., "LogAlot Alerts") and click <strong>Create</strong>.</li>
+                                <li>Copy the generated Webhook URL and paste it into the field below.</li>
+                            </ol>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="jira">
+                        <AccordionTrigger>Jira API Token</AccordionTrigger>
+                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                           <ol>
+                                <li>Log in to your Atlassian account that has Jira access.</li>
+                                <li>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer">API Tokens</a> in your profile settings.</li>
+                                <li>Click <strong>Create API token</strong>.</li>
+                                <li>Give your token a descriptive label (e.g., "LogAlot-Integration").</li>
+                                <li>Copy the token immediately and paste it into the field below. You won't be able to see it again.</li>
+                           </ol>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="github">
+                        <AccordionTrigger>GitHub Personal Access Token (PAT)</AccordionTrigger>
+                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                           <ol>
+                                <li>Go to your GitHub account settings and navigate to <strong>Developer settings</strong> {">"} <strong>Personal access tokens</strong> {">"} <strong>Tokens (classic)</strong>.</li>
+                                <li>Click <strong>Generate new token</strong> and select "Generate new token (classic)".</li>
+                                <li>Give the token a descriptive name and select the necessary scopes. For creating issues, you will need the <strong>repo</strong> scope.</li>
+                                <li>Click <strong>Generate token</strong>.</li>
+                                <li>Copy the token and paste it into the field below. Store it securely.</li>
+                           </ol>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </CardContent>
+        </Card>
+
+
           {connectors.map((connector) => (
             <Card key={connector.name} className="neo-outset">
               <CardHeader className="flex flex-row items-center gap-4">
