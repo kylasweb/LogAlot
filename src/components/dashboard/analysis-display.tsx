@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -93,6 +93,13 @@ function Markdown({ content }: { content: string }) {
 
 export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
   const { toast } = useToast();
+  const [showTeam, setShowTeam] = useState(false);
+
+  useEffect(() => {
+    const animationEnabled = localStorage.getItem('show_analysis_animation') === 'true';
+    setShowTeam(animationEnabled);
+  }, []);
+
   
   const handleShare = (platform: string) => {
     toast({
@@ -146,14 +153,18 @@ export function AnalysisDisplay({ report }: { report: AnalysisReport }) {
           <Markdown content={report.summary} />
         </Section>
         
-        <Separator />
-        <Section icon={<Users />} title="Analyzed by">
-            <div className="flex space-x-6">
-                {team.map((member) => (
-                    <TeamAvatar key={member.name} name={member.name} title={member.title} icon={member.icon} />
-                ))}
-            </div>
-        </Section>
+        {showTeam && (
+            <>
+                <Separator />
+                <Section icon={<Users />} title="Analyzed by">
+                    <div className="flex space-x-6">
+                        {team.map((member) => (
+                            <TeamAvatar key={member.name} name={member.name} title={member.title} icon={member.icon} />
+                        ))}
+                    </div>
+                </Section>
+            </>
+        )}
 
         {report.traceback && (
           <>
