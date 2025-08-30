@@ -116,4 +116,71 @@ The report should include:
 - **Data-Level Prevention**: Recommend schema changes, constraints, or validation rules to prevent recurrence.
 `,
   },
+  {
+    id: 'executive-summary-brief',
+    name: 'Executive Summary Brief',
+    prompt: `
+Generate a one-paragraph executive summary for a non-technical leadership audience.
+
+The summary must include:
+- **What Happened**: A simple, jargon-free explanation of the problem.
+- **Business Impact**: How did this affect customers or the business?
+- **Status**: Is the issue resolved? What is the current status?
+- **Next Steps**: Briefly mention the plan to prevent future occurrences.
+`,
+  },
+  {
+    id: 'qa-regression-plan',
+    name: 'QA Regression Plan',
+    prompt: `
+Create a regression testing plan for the Quality Assurance team based on the fix for this error.
+
+The plan should include:
+- **Test Objective**: What is the goal of this regression test?
+- **Core Functionality to Test**: List the primary user flows or features that must be re-verified.
+- **Edge Cases**: Identify potential edge cases related to the fix that should be tested.
+- **Test Environment**: Specify the recommended environment and any required test data.
+- **Success Criteria**: Define what constitutes a successful test run.
+`,
+  },
+  {
+    id: 'technical-debt-ticket',
+    name: 'Technical Debt Ticket',
+    prompt: `
+Format the analysis as a technical debt ticket for backlog grooming.
+
+The ticket should include:
+- **Title**: A clear title starting with "Tech Debt:".
+- **Problem Statement**: Why is the current implementation problematic?
+- **Proposed Refactor**: What is the recommended long-term solution?
+- **Justification**: Why is this refactor important (e.g., improves stability, reduces complexity, enhances performance)?
+- **Effort Estimate**: A t-shirt size estimate (S, M, L) for the refactoring effort.
+`,
+  },
+  {
+    id: 'social-media-update',
+    name: 'Social Media Update (e.g., Twitter)',
+    prompt: `
+Draft a very brief, public-facing update suitable for a social media platform like Twitter.
+
+The message should be:
+- **Concise**: Under 280 characters.
+- **Reassuring**: Acknowledge the issue without causing panic.
+- **Status-Oriented**: Inform users that you are aware of the issue and are working on it, or that it has been resolved.
+- **Actionable (Optional)**: If there's a status page, link to it.
+`,
+  },
+  {
+    id: 'billing-impact-analysis',
+    name: 'Billing Impact Analysis',
+    prompt: `
+Analyze the logs for any potential impact on billing systems or customer charges.
+
+The report for the finance and billing team should include:
+- **Potential Impact**: Did this error cause overcharging, undercharging, or failed transactions?
+- **Affected Customers**: Can you identify a list or segment of customers who might be affected?
+- **Data Required for Audit**: What data needs to be pulled to verify the impact (e.g., transaction IDs, user IDs, timestamps)?
+- **Urgency Level**: Classify the urgency for the billing team (e.g., Critical, High, Medium, Low).
+`,
+  },
 ];

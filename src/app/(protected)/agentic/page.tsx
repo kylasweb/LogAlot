@@ -67,7 +67,7 @@ import { useToast } from "@/hooks/use-toast";
 import { WorkflowBuilder } from "@/components/agentic/workflow-builder";
 import type { Agent, WorkflowTemplate } from "@/lib/types";
 import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 
 const initialAgents: Agent[] = [
@@ -126,6 +126,62 @@ const initialAgents: Agent[] = [
     description: 'Generates a formal postmortem document for incident review.',
     instructions: 'You are a technical writer specializing in incident postmortems. Structure the full analysis into a formal report with sections for Summary, Impact, Root Cause, Resolution, and Action Items.',
     model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'root-cause-deep-dive',
+    name: 'Root Cause Deep-Dive Agent',
+    description: 'Performs an in-depth analysis to find the underlying root cause.',
+    instructions: 'You are a principal engineer specializing in root cause analysis. Go beyond the immediate error and investigate contributing factors, recent changes, and system architecture to determine the true root cause.',
+    model: 'gemini-2.5-pro',
+  },
+  {
+    id: 'business-impact-analyst',
+    name: 'Business Impact Analyst',
+    description: 'Assesses the business and customer impact of an error.',
+    instructions: 'You are a product manager. Analyze the error and its context to determine the impact on users, business metrics (e.g., revenue, conversion), and SLAs. Quantify the impact where possible.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'prevention-strategist',
+    name: 'Prevention Strategist Agent',
+    description: 'Suggests long-term strategies to prevent similar errors.',
+    instructions: 'You are a systems architect. Based on the analysis, propose long-term architectural improvements, process changes, or monitoring enhancements to prevent this class of error from recurring.',
+    model: 'gemini-2.5-pro',
+  },
+  {
+    id: 'code-quality-reviewer',
+    name: 'Code Quality Reviewer',
+    description: 'Reviews related code for quality and best practice violations.',
+    instructions: 'You are an automated code review tool. Analyze the provided code snippets and suggest improvements related to style, performance, readability, and adherence to best practices.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'dependency-analyst',
+    name: 'Dependency Analyst Agent',
+    description: 'Checks for known vulnerabilities in related dependencies.',
+    instructions: 'You are a dependency management expert. Analyze the tech stack and error to identify potentially problematic third-party libraries. Check for known vulnerabilities, version conflicts, or deprecation issues.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'data-analyst',
+    name: 'Data Analyst Agent',
+    description: 'Analyzes logs for data anomalies or corruption patterns.',
+    instructions: 'You are a data analyst. Scrutinize the logs for patterns that suggest data corruption, inconsistency, or integrity issues. Pinpoint the affected data if possible.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'documentation-writer',
+    name: 'Documentation Writer Agent',
+    description: 'Generates a draft for internal technical documentation.',
+    instructions: 'You are a technical writer. Based on the incident and its resolution, draft an internal knowledge base article explaining the problem, the fix, and how to troubleshoot it in the future.',
+    model: 'gemini-2.5-flash',
+  },
+  {
+    id: 'resource-estimator',
+    name: 'Resource Estimator Agent',
+    description: 'Estimates the engineering effort required for a fix.',
+    instructions: 'You are an engineering manager. Based on the proposed solution, estimate the complexity and time required to implement and test the fix. Provide a story point estimate (e.g., 1, 2, 3, 5, 8).',
+    model: 'gemini-2.5-flash',
   }
 ];
 
@@ -137,6 +193,12 @@ const workflowTemplates: WorkflowTemplate[] = [
     { id: 'qa', name: 'QA & Test Generation', agents: ['summarizer', 'traceback', 'qa-engineer'] },
     { id: 'full-incident', name: 'Full Incident Response', agents: ['summarizer', 'traceback', 'solution', 'sre-ticketing', 'postmortem-writer'] },
     { id: 'quick-look', name: 'Quick Look Summary', agents: ['summarizer'] },
+    { id: 'deep-dive', name: 'Deep-Dive Root Cause Analysis', agents: ['summarizer', 'root-cause-deep-dive', 'prevention-strategist', 'solution'] },
+    { id: 'proactive-tech-debt', name: 'Proactive Tech Debt', agents: ['summarizer', 'code-quality-reviewer', 'resource-estimator', 'sre-ticketing'] },
+    { id: 'full-security-audit', name: 'Full Security Audit', agents: ['summarizer', 'security-analyst', 'dependency-analyst', 'solution'] },
+    { id: 'data-focused-triage', name: 'Data-Focused Triage', agents: ['summarizer', 'data-analyst', 'traceback', 'solution'] },
+    { id: 'product-impact-review', name: 'Product Impact Review', agents: ['summarizer', 'business-impact-analyst', 'customer-comms'] },
+    { id: 'internal-documentation', name: 'Internal Documentation Workflow', agents: ['summarizer', 'traceback', 'solution', 'documentation-writer'] },
 ];
 
 
@@ -369,14 +431,16 @@ export default function AgenticPage() {
                             <Switch id="sync-dashboard" checked={isSyncEnabled} onCheckedChange={setIsSyncEnabled} />
                             <Label htmlFor="sync-dashboard" className="flex items-center gap-1">
                                 Sync with Dashboard
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Info className="w-3 h-3 text-muted-foreground"/>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>When enabled, the workflow here will be used for log analysis.</p>
-                                    </TooltipContent>
-                                </Tooltip>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Info className="w-3 h-3 text-muted-foreground"/>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>When enabled, the workflow here will be used for log analysis.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </Label>
                         </div>
                         <Select value={selectedTemplateId} onValueChange={handleTemplateChange}>
@@ -458,5 +522,3 @@ export default function AgenticPage() {
     </div>
   );
 }
-
-    
