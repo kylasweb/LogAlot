@@ -2,15 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+
+import React, { useContext } from "react";
 import Link from "next/link";
+import { FeatureToggleContext } from "@/lib/feature-toggle-context";
 
 const kbNav = [
-    { name: "Introduction", href: "/kb" },
-    { name: "Guides", href: "/kb/guides" },
-    { name: "How to Use", href: "/kb/how-to-use" },
-    { name: "Logics Used", href: "/kb/logics-used" },
-    { name: "Template Explanations", href: "/kb/template-explanations" },
-    { name: "Configurations", href: "/kb/configurations" },
+  { name: "Introduction", href: "/kb" },
+  { name: "Guides", href: "/kb/guides", agentic: true },
+  { name: "How to Use", href: "/kb/how-to-use", agentic: true },
+  { name: "Logics Used", href: "/kb/logics-used", agentic: true },
+  { name: "Template Explanations", href: "/kb/template-explanations", templates: true },
+  { name: "Configurations", href: "/kb/configurations", agentic: true },
 ];
 
 
@@ -19,6 +22,7 @@ export default function KnowledgeBaseLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { toggles } = useContext(FeatureToggleContext);
   return (
     <div className="flex flex-col h-full">
       <header className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 sticky top-0 z-10 bg-background border-b">
@@ -36,7 +40,11 @@ export default function KnowledgeBaseLayout({
                     </CardHeader>
                     <CardContent>
                         <nav className="flex flex-col space-y-2">
-                            {kbNav.map((item) => (
+                            {kbNav.filter(item => {
+                              if (item.agentic && !toggles.agentic) return false;
+                              if (item.templates && !toggles.templates) return false;
+                              return true;
+                            }).map((item) => (
                                 <Button key={item.name} variant="ghost" className="justify-start" asChild>
                                     <Link href={item.href}>{item.name}</Link>
                                 </Button>

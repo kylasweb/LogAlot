@@ -45,6 +45,8 @@ import { useToast } from "@/hooks/use-toast";
 import { templates } from "@/lib/templates";
 import { AiTeamAnimation } from "./ai-team-animation";
 import { exampleLogs } from "@/lib/example-logs";
+import React, { useContext } from "react";
+import { FeatureToggleContext } from "@/lib/feature-toggle-context";
 
 
 const formSchema = z.object({
@@ -95,13 +97,20 @@ export function LogAnalyzer() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [workflow, setWorkflow] = useState<Workflow>({ agents: [] });
   const [showAnimation, setShowAnimation] = useState(false);
+  const { toggles } = useContext(FeatureToggleContext);
 
 
   useEffect(() => {
     // Load settings from localStorage
     const animationEnabled = localStorage.getItem('show_analysis_animation') === 'true';
     setShowAnimation(animationEnabled);
-    
+
+    // Template toggle logic
+    if (!toggles.templates) {
+      // Use postmortem report template only
+      localStorage.setItem('agentic_selectedTemplateId', 'postmortem-report');
+    }
+
     const syncEnabled = localStorage.getItem('agentic_syncEnabled') === 'true';
     if (syncEnabled) {
         const templateId = localStorage.getItem('agentic_selectedTemplateId');
@@ -117,7 +126,7 @@ export function LogAnalyzer() {
         const defaultTemplate = workflowTemplates.find(t => t.id === 'default')!;
         setWorkflow({ agents: defaultTemplate.agents.map(id => initialAgents.find(a => a.id === id)).filter(Boolean) as Agent[] });
     }
-  }, []);
+  }, [toggles.templates]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

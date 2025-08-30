@@ -1,7 +1,8 @@
 
 "use client";
 
-import type { ReactNode } from "react";
+import React, { ReactNode, useContext } from "react";
+import { FeatureToggleContext } from "@/lib/feature-toggle-context";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -24,6 +25,7 @@ import { Logo } from "@/components/icons";
 
 export function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { toggles } = useContext(FeatureToggleContext);
 
   return (
     <SidebarProvider>
@@ -52,47 +54,51 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith("/agentic")}
-                  tooltip={{ children: "Agentic" }}
-                >
-                  <Link href="/agentic">
-                    <Bot />
-                    <span>Agentic</span>
-                  </Link>
-                </SidebarMenuButton>
-                 <SidebarMenuSub>
-                  <li>
-                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/fine-tuning")}>
-                        <Link href="/agentic/fine-tuning"><BrainCircuit /> Fine-Tuning</Link>
-                    </SidebarMenuSubButton>
-                  </li>
-                   <li>
-                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/ab-testing")}>
-                        <Link href="/agentic/ab-testing"><FlaskConical /> A/B Testing</Link>
-                    </SidebarMenuSubButton>
-                  </li>
-                   <li>
-                    <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/hyper-parameters")}>
-                        <Link href="/agentic/hyper-parameters"><WandSparkles /> Hyper-parameters</Link>
-                    </SidebarMenuSubButton>
-                  </li>
-                 </SidebarMenuSub>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith("/kb")}
-                  tooltip={{ children: "Knowledge Base" }}
-                >
-                  <Link href="/kb">
-                    <BookOpen />
-                    <span>Knowledge Base</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {toggles.agentic && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith("/agentic")}
+                    tooltip={{ children: "Agentic" }}
+                  >
+                    <Link href="/agentic">
+                      <Bot />
+                      <span>Agentic</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  <SidebarMenuSub>
+                    <li>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/fine-tuning")}> 
+                          <Link href="/agentic/fine-tuning"><BrainCircuit /> Fine-Tuning</Link>
+                      </SidebarMenuSubButton>
+                    </li>
+                    <li>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/ab-testing")}> 
+                          <Link href="/agentic/ab-testing"><FlaskConical /> A/B Testing</Link>
+                      </SidebarMenuSubButton>
+                    </li>
+                    <li>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/agentic/hyper-parameters")}> 
+                          <Link href="/agentic/hyper-parameters"><WandSparkles /> Hyper-parameters</Link>
+                      </SidebarMenuSubButton>
+                    </li>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              )}
+              {toggles.agentic && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith("/kb")}
+                    tooltip={{ children: "Knowledge Base" }}
+                  >
+                    <Link href="/kb">
+                      <BookOpen />
+                      <span>Knowledge Base</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
@@ -105,7 +111,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-               <SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
                   isActive={pathname.startsWith("/connectors")}

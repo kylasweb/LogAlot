@@ -71,6 +71,32 @@ const connectors = [
 ];
 
 export default function ConnectorsPage() {
+  // State for all connector configs
+  const [configs, setConfigs] = useState(() => {
+    // Load from localStorage on mount
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("connectorConfigs");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  // Save configs to localStorage
+  const saveConfigs = () => {
+    localStorage.setItem("connectorConfigs", JSON.stringify(configs));
+  };
+
+  // Handle input change
+  const handleChange = (connectorName: string, fieldKey: string, value: string) => {
+    setConfigs((prev: any) => ({
+      ...prev,
+      [connectorName]: {
+        ...prev[connectorName],
+        [fieldKey]: value,
+      },
+    }));
+  };
+
   return (
     <div className="flex flex-col h-full">
       <header className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 sticky top-0 z-10 bg-background border-b">
@@ -84,56 +110,56 @@ export default function ConnectorsPage() {
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
         <div className="mx-auto max-w-6xl space-y-6">
-
-        <Card className="neo-outset">
+          {/* ...existing Configuration Guide Card... */}
+          <Card className="neo-outset">
             <CardHeader>
-                <CardTitle className="font-headline">Configuration Guide</CardTitle>
-                <CardDescription>
-                    Instructions for finding the required credentials for each service.
-                </CardDescription>
+              <CardTitle className="font-headline">Configuration Guide</CardTitle>
+              <CardDescription>
+                Instructions for finding the required credentials for each service.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="teams">
-                        <AccordionTrigger>Microsoft Teams Webhook URL</AccordionTrigger>
-                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
-                            <ol>
-                                <li>Navigate to the Teams channel where you want to receive notifications.</li>
-                                <li>Click on the three dots (More options) next to the channel name and select <strong>Connectors</strong>.</li>
-                                <li>Find <strong>Incoming Webhook</strong> and click <strong>Configure</strong>.</li>
-                                <li>Provide a name for the webhook (e.g., "LogAlot Alerts") and click <strong>Create</strong>.</li>
-                                <li>Copy the generated Webhook URL and paste it into the field below.</li>
-                            </ol>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="jira">
-                        <AccordionTrigger>Jira API Token</AccordionTrigger>
-                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
-                           <ol>
-                                <li>Log in to your Atlassian account that has Jira access.</li>
-                                <li>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer">API Tokens</a> in your profile settings.</li>
-                                <li>Click <strong>Create API token</strong>.</li>
-                                <li>Give your token a descriptive label (e.g., "LogAlot-Integration").</li>
-                                <li>Copy the token immediately and paste it into the field below. You won't be able to see it again.</li>
-                           </ol>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="github">
-                        <AccordionTrigger>GitHub Personal Access Token (PAT)</AccordionTrigger>
-                        <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
-                           <ol>
-                                <li>Go to your GitHub account settings and navigate to <strong>Developer settings</strong> {">"} <strong>Personal access tokens</strong> {">"} <strong>Tokens (classic)</strong>.</li>
-                                <li>Click <strong>Generate new token</strong> and select "Generate new token (classic)".</li>
-                                <li>Give the token a descriptive name and select the necessary scopes. For creating issues, you will need the <strong>repo</strong> scope.</li>
-                                <li>Click <strong>Generate token</strong>.</li>
-                                <li>Copy the token and paste it into the field below. Store it securely.</li>
-                           </ol>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+              <Accordion type="single" collapsible className="w-full">
+                {/* ...existing AccordionItems... */}
+                <AccordionItem value="teams">
+                  <AccordionTrigger>Microsoft Teams Webhook URL</AccordionTrigger>
+                  <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                    <ol>
+                      <li>Navigate to the Teams channel where you want to receive notifications.</li>
+                      <li>Click on the three dots (More options) next to the channel name and select <strong>Connectors</strong>.</li>
+                      <li>Find <strong>Incoming Webhook</strong> and click <strong>Configure</strong>.</li>
+                      <li>Provide a name for the webhook (e.g., "LogAlot Alerts") and click <strong>Create</strong>.</li>
+                      <li>Copy the generated Webhook URL and paste it into the field below.</li>
+                    </ol>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="jira">
+                  <AccordionTrigger>Jira API Token</AccordionTrigger>
+                  <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                    <ol>
+                      <li>Log in to your Atlassian account that has Jira access.</li>
+                      <li>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer">API Tokens</a> in your profile settings.</li>
+                      <li>Click <strong>Create API token</strong>.</li>
+                      <li>Give your token a descriptive label (e.g., "LogAlot-Integration").</li>
+                      <li>Copy the token immediately and paste it into the field below. You won't be able to see it again.</li>
+                    </ol>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="github">
+                  <AccordionTrigger>GitHub Personal Access Token (PAT)</AccordionTrigger>
+                  <AccordionContent className="prose prose-stone dark:prose-invert max-w-none">
+                    <ol>
+                      <li>Go to your GitHub account settings and navigate to <strong>Developer settings</strong> {">"} <strong>Personal access tokens</strong> {">"} <strong>Tokens (classic)</strong>.</li>
+                      <li>Click <strong>Generate new token</strong> and select "Generate new token (classic)".</li>
+                      <li>Give the token a descriptive name and select the necessary scopes. For creating issues, you will need the <strong>repo</strong> scope.</li>
+                      <li>Click <strong>Generate token</strong>.</li>
+                      <li>Copy the token and paste it into the field below. Store it securely.</li>
+                    </ol>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
-        </Card>
-
+          </Card>
 
           {connectors.map((connector) => (
             <Card key={connector.name} className="neo-outset">
@@ -146,34 +172,47 @@ export default function ConnectorsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {connector.fields.map((field) => {
-                    const { key, ...fieldProps } = field;
-                    return <ConnectorInput key={key} {...fieldProps} />;
-                })}
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" className="neo-button">
-                    <TestTube className="mr-2" /> Test
-                  </Button>
-                  <Button className="neo-button">
-                    <Save className="mr-2" /> Save
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </main>
-    </div>
-  );
-}
+                  const { key, ...fieldProps } = field;
+                  return (
+                    interface ConnectorInputProps {
+                      label: string;
+                      type: string;
+                      placeholder: string;
+                      value: string;
+                      onChange: (val: string) => void;
+                    }
 
-function ConnectorInput({
-  label,
-  type,
-  placeholder,
-}: {
-  label: string;
-  type: string;
-  placeholder: string;
+                    function ConnectorInput({ label, type, placeholder, value, onChange }: ConnectorInputProps) {
+                      const [showSecret, setShowSecret] = useState(false);
+                      const isSecret = type === "password";
+                      return (
+                        <div className="space-y-2">
+                          <Label>{label}</Label>
+                          <div className="relative">
+                            <Input
+                              type={isSecret && !showSecret ? "password" : "text"}
+                              placeholder={placeholder}
+                              className="neo-inset"
+                              value={value}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+                            />
+                            {isSecret && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                                onClick={() => setShowSecret(!showSecret)}
+                              >
+                                {showSecret ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
 }) {
     const [showSecret, setShowSecret] = useState(false);
     const isSecret = type === 'password';
@@ -195,35 +234,48 @@ function ConnectorInput({
               ) : (
                 <Eye className="h-4 w-4" />
               )}
-            </Button>
-          )}
-      </div>
-    </div>
-  );
-}
-
-
-function UserMenu() {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full neo-button">
-          <Avatar className="h-9 w-9">
-            <AvatarImage
-              src="https://picsum.photos/100"
-              alt="User Avatar"
-              data-ai-hint="person face"
-            />
-            <AvatarFallback>AD</AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 neo-outset" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Admin User</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              admin@example.com
+              value,
+              onChange,
+              label,
+              type,
+              placeholder,
+            }: {
+              value: string;
+              onChange: (val: string) => void;
+              label: string;
+              type: string;
+              placeholder: string;
+            }) {
+              const [showSecret, setShowSecret] = useState(false);
+              const isSecret = type === "password";
+              return (
+                <div className="space-y-2">
+                  <Label>{label}</Label>
+                  <div className="relative">
+                    <Input
+                      type={isSecret && !showSecret ? "password" : "text"}
+                      placeholder={placeholder}
+                      className="neo-inset"
+                      value={value}
+                      onChange={e => onChange(e.target.value)}
+                    />
+                    {isSecret && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                        onClick={() => setShowSecret(!showSecret)}
+                      >
+                        {showSecret ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
             </p>
           </div>
         </DropdownMenuLabel>
