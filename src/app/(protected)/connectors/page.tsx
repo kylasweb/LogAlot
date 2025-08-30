@@ -161,50 +161,17 @@ export default function ConnectorsPage() {
             </CardContent>
           </Card>
 
-          {connectors.map((connector) => (
-            <Card key={connector.name} className="neo-outset">
-              <CardHeader className="flex flex-row items-center gap-4">
-                {connector.icon}
-                <div>
-                  <CardTitle className="font-headline">{connector.name}</CardTitle>
-                  <CardDescription>{connector.description}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
                 {connector.fields.map((field) => {
                   const { key, ...fieldProps } = field;
                   return (
-                    interface ConnectorInputProps {
-                      label: string;
-                      type: string;
-                      placeholder: string;
-                      value: string;
-                      onChange: (val: string) => void;
-                    }
-
-                    function ConnectorInput({ label, type, placeholder, value, onChange }: ConnectorInputProps) {
-                      const [showSecret, setShowSecret] = useState(false);
-                      const isSecret = type === "password";
-                      return (
-                        <div className="space-y-2">
-                          <Label>{label}</Label>
-                          <div className="relative">
-                            <Input
-                              type={isSecret && !showSecret ? "password" : "text"}
-                              placeholder={placeholder}
-                              className="neo-inset"
-                              value={value}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-                            />
-                            {isSecret && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
-                                onClick={() => setShowSecret(!showSecret)}
-                              >
-                                {showSecret ? (
-                                  <EyeOff className="h-4 w-4" />
+                    <ConnectorInput
+                      key={key}
+                      {...fieldProps}
+                      value={configs[connector.name]?.[key] || ""}
+                      onChange={(val: string) => handleChange(connector.name, key, val)}
+                    />
+                  );
+                })}
                                 ) : (
                                   <Eye className="h-4 w-4" />
                                 )}
@@ -213,16 +180,21 @@ export default function ConnectorsPage() {
                           </div>
                         </div>
                       );
-}) {
+                    }
     const [showSecret, setShowSecret] = useState(false);
-    const isSecret = type === 'password';
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="relative">
-        <Input type={isSecret && !showSecret ? "password" : "text"} placeholder={placeholder} className="neo-inset" />
-        {isSecret && (
+    const isSecret = type === "password";
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <div className="relative">
+          <Input
+            type={isSecret && !showSecret ? "password" : "text"}
+            placeholder={placeholder}
+            className="neo-inset"
+            value={value}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+          />
+          {isSecret && (
             <Button
               variant="ghost"
               size="icon"
@@ -234,62 +206,8 @@ export default function ConnectorsPage() {
               ) : (
                 <Eye className="h-4 w-4" />
               )}
-              value,
-              onChange,
-              label,
-              type,
-              placeholder,
-            }: {
-              value: string;
-              onChange: (val: string) => void;
-              label: string;
-              type: string;
-              placeholder: string;
-            }) {
-              const [showSecret, setShowSecret] = useState(false);
-              const isSecret = type === "password";
-              return (
-                <div className="space-y-2">
-                  <Label>{label}</Label>
-                  <div className="relative">
-                    <Input
-                      type={isSecret && !showSecret ? "password" : "text"}
-                      placeholder={placeholder}
-                      className="neo-inset"
-                      value={value}
-                      onChange={e => onChange(e.target.value)}
-                    />
-                    {isSecret && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={() => setShowSecret(!showSecret)}
-                      >
-                        {showSecret ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link2 className="mr-2 h-4 w-4" />
-          <span>Connectors</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
