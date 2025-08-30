@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext } from 'react';
 import { FeatureToggleContext } from '../../lib/feature-toggle-context';
 import { Switch } from '../../components/ui/switch';
