@@ -6,20 +6,23 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Briefcase, Code, TestTube } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const agents = [
+const defaultAgents = [
   {
+    role: "lead",
     name: "Anu",
     title: "Project Lead",
     icon: <Briefcase className="w-6 h-6" />,
     style: "bg-blue-200 text-blue-800",
   },
   {
+    role: "dev",
     name: "Akhil",
     title: "Senior Developer",
     icon: <Code className="w-6 h-6" />,
     style: "bg-green-200 text-green-800",
   },
   {
+    role: "qa",
     name: "Shincy",
     title: "QA Engineer",
     icon: <TestTube className="w-6 h-6" />,
@@ -61,14 +64,26 @@ const shuffleArray = (array: any[]) => {
 export function AiTeamAnimation() {
   const [currentLine, setCurrentLine] = useState(0);
   const [conversation, setConversation] = useState(all_conversations);
-
+  const [agents, setAgents] = useState(defaultAgents);
 
   useEffect(() => {
-    setConversation(shuffleArray([...all_conversations]));
+    const leadName = localStorage.getItem('team_name_lead') || 'Anu';
+    const devName = localStorage.getItem('team_name_dev') || 'Akhil';
+    const qaName = localStorage.getItem('team_name_qa') || 'Shincy';
+    
+    setAgents(prev => prev.map(agent => {
+        if (agent.role === 'lead') return {...agent, name: leadName};
+        if (agent.role === 'dev') return {...agent, name: devName};
+        if (agent.role === 'qa') return {...agent, name: qaName};
+        return agent;
+    }));
+
+    const shuffledConversation = shuffleArray([...all_conversations]);
+    setConversation(shuffledConversation);
     setCurrentLine(0);
 
     const interval = setInterval(() => {
-      setCurrentLine((prev) => (prev + 1) % conversation.length);
+      setCurrentLine((prev) => (prev + 1) % shuffledConversation.length);
     }, 2500);
 
     return () => clearInterval(interval);

@@ -37,14 +37,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { WandSparkles, Loader2, Upload, GitBranch, FileText } from "lucide-react";
+import { WandSparkles, Loader2, Upload, FileText } from "lucide-react";
 import { analyzeLogsAction } from "@/app/actions";
 import { AnalysisDisplay } from "./analysis-display";
 import type { AnalysisReport, Agent, Workflow, WorkflowTemplate } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { templates } from "@/lib/templates";
 import { AiTeamAnimation } from "./ai-team-animation";
-import { Switch } from "@/components/ui/switch";
 import { exampleLogs } from "@/lib/example-logs";
 
 
@@ -95,10 +94,14 @@ export function LogAnalyzer() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [workflow, setWorkflow] = useState<Workflow>({ agents: [] });
+  const [showAnimation, setShowAnimation] = useState(false);
 
 
   useEffect(() => {
-    // Load the active workflow from localStorage
+    // Load settings from localStorage
+    const animationEnabled = localStorage.getItem('show_analysis_animation') === 'true';
+    setShowAnimation(animationEnabled);
+    
     const syncEnabled = localStorage.getItem('agentic_syncEnabled') === 'true';
     if (syncEnabled) {
         const templateId = localStorage.getItem('agentic_selectedTemplateId');
@@ -298,7 +301,14 @@ export function LogAnalyzer() {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-              <AiTeamAnimation />
+              {showAnimation ? (
+                <AiTeamAnimation />
+              ) : (
+                <>
+                  <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Analyzing your logs...</p>
+                </>
+              )}
             </CardContent>
           </Card>
         )}

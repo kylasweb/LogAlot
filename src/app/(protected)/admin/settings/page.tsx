@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -36,14 +36,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 interface Setting {
     key: string;
     description: string;
-    type: 'secret' | 'model';
+    type: 'secret' | 'model' | 'switch' | 'text';
     isManaged?: boolean;
-    value?: string;
+    value?: any;
     options?: { value: string; label: string; recommended?: boolean }[];
+    group?: string;
 }
 
 const settingsConfig: { group: string, settings: Setting[] }[] = [
@@ -91,6 +93,35 @@ const settingsConfig: { group: string, settings: Setting[] }[] = [
       },
     ],
   },
+  {
+      group: "UI & Animation",
+      settings: [
+          {
+              key: "show_analysis_animation",
+              description: "Enable or disable the AI team animation during log analysis.",
+              type: 'switch',
+              value: false, // Default to disabled
+          },
+          {
+              key: "team_name_lead",
+              description: "Display name for the Project Lead in the animation.",
+              type: 'text',
+              value: "Anu",
+          },
+          {
+              key: "team_name_dev",
+              description: "Display name for the Senior Developer in the animation.",
+              type: 'text',
+              value: "Akhil",
+          },
+          {
+              key: "team_name_qa",
+              description: "Display name for the QA Engineer in the animation.",
+              type: 'text',
+              value: "Shincy",
+          }
+      ]
+  }
 ];
 
 export default function SettingsPage() {
@@ -106,7 +137,7 @@ export default function SettingsPage() {
         <UserMenu />
       </header>
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">
@@ -117,9 +148,24 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              {settingsConfig.map((group) => (
+              {settingsConfig.filter(g => g.group !== 'UI & Animation').map((group) => (
                 <SettingsGroup key={group.group} {...group} />
               ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">
+                    UI & Animation
+                </CardTitle>
+                <CardDescription>
+                    Customize the look and feel of the dashboard analysis experience.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+                {settingsConfig.filter(g => g.group === 'UI & Animation').map((group) => (
+                    <SettingsGroup key={group.group} {...group} />
+                ))}
             </CardContent>
           </Card>
         </div>
@@ -148,9 +194,30 @@ function SettingsGroup({
 }
 
 function SettingInput({ setting }: { setting: Setting }) {
-  const { key, description, type, isManaged, value, options } = setting;
+  const { key, description, type, isManaged, options } = setting;
   const [showSecret, setShowSecret] = useState(false);
+  const [value, setValue] = useState(setting.value);
   const { toast } = useToast();
+
+  useEffect(() => {
+      const savedValue = localStorage.getItem(key);
+      if (savedValue !== null) {
+          if (type === 'switch') {
+              setValue(JSON.parse(savedValue));
+          } else {
+              setValue(savedValue);
+          }
+      }
+  }, [key, type]);
+
+
+  const handleSave = () => {
+    localStorage.setItem(key, typeof value === 'boolean' ? JSON.stringify(value) : value);
+    toast({
+        title: "Setting Saved",
+        description: `${description} has been updated.`,
+    });
+  }
 
   const handleTest = () => {
     toast({
@@ -200,7 +267,7 @@ function SettingInput({ setting }: { setting: Setting }) {
             );
         case 'model':
             return (
-                <Select defaultValue={value} disabled={isManaged}>
+                <Select defaultValue={value} onValueChange={setValue} disabled={isManaged}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a model..." />
                     </SelectTrigger>
@@ -215,6 +282,23 @@ function SettingInput({ setting }: { setting: Setting }) {
                         ))}
                     </SelectContent>
                 </Select>
+            );
+        case 'switch':
+            return (
+                <Switch
+                    checked={value}
+                    onCheckedChange={setValue}
+                    aria-label={description}
+                />
+            );
+        case 'text':
+            return (
+                <Input
+                    id={key}
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    className="w-full"
+                />
             )
     }
   }
@@ -235,9 +319,16 @@ function SettingInput({ setting }: { setting: Setting }) {
             <TestTube className="h-4 w-4" />
           </Button>
         )}
-        <Button size="icon" disabled={isManaged}>
-          <Save className="h-4 w-4" />
-        </Button>
+        {type !== 'switch' && (
+            <Button size="icon" onClick={handleSave} disabled={isManaged}>
+                <Save className="h-4 w-4" />
+            </Button>
+        )}
+        {type === 'switch' && (
+            <Button size="icon" onClick={handleSave}>
+                <Save className="h-4 w-4" />
+            </Button>
+        )}
       </div>
     </div>
   );
